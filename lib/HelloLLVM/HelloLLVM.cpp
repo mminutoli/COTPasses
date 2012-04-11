@@ -99,6 +99,8 @@ llvm::Function &HelloLLVM::GetHelloWorld(llvm::Module &Mod, bool &Modified) {
            end = helloWorldString.end();
        itr != end; ++itr)
     helloWorld.push_back(llvm::ConstantInt::get(ElementType, *itr));
+  // Add the null terminator
+  helloWorld.push_back(llvm::ConstantInt::get(ElementType, 0));
 
   llvm::Constant *MsgInit = llvm::ConstantArray::get(ArrayType, helloWorld);
 
