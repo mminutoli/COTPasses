@@ -92,7 +92,8 @@ llvm::Function &HelloLLVM::GetHelloWorld(llvm::Module &Mod, bool &Modified) {
   std::string helloWorldString = "Hello, World!\n";
 
   llvm::IntegerType * ElementType = llvm::IntegerType::get(Ctx, 8);
-  llvm::ArrayType * ArrayType = llvm::ArrayType::get(ElementType, 14);
+  llvm::ArrayType * ArrayType = llvm::ArrayType::get(ElementType,
+                                                     helloWorldString.length() + 1);
 
   llvm::SmallVector<llvm::Constant *, 14> helloWorld;
   for (std::string::iterator itr = helloWorldString.begin(),
