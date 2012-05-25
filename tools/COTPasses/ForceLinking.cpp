@@ -27,7 +27,8 @@ public:
 
     // Analysis.
     CreateInstructionCountPass();
-
+    CreateDataDependencyGraphPass();
+    
     // Transformations.
     CreateHelloLLVMPass();
     CreateFunctionEraserPass();
@@ -46,6 +47,7 @@ public:
 
     // Analysis.
     initializeInstructionCountPass(Registry);
+    initializeDataDependencyGraphPass(Registry);
 
     // Transformations.
     initializeHelloLLVMPass(Registry);
