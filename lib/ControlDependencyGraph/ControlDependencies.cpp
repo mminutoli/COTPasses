@@ -49,6 +49,6 @@ ControlDependencyGraph *CreateControlDependencyGraphPass()
 
 
 INITIALIZE_PASS(ControlDependencyGraph, "cdgraph",
-                "Control Dependency Graph Contruction"
+                "Control Dependency Graph Contruction",
                 true,
                 true)
