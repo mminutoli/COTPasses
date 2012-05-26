@@ -14,11 +14,13 @@ namespace cot {
 class InstructionCount;
 class DataDependencyGraph;
 class ControlDependencyGraph;
+class ProgramDependencyGraph;
 
 // Analysis.
 InstructionCount *CreateInstructionCountPass();
 DataDependencyGraph *CreateDataDependencyGraphPass();
 ControlDependencyGraph *CreateControlDependencyGraphPass();
+ProgramDependencyGraph *CreateProgramDependencyGraphPass();
 
 // Transformations.
 llvm::Pass *CreateHelloLLVMPass();
@@ -34,6 +36,7 @@ class PassRegistry;
 void initializeInstructionCountPass(PassRegistry &Registry);
 void initializeDataDependencyGraphPass(PassRegistry &Registry);
 void initializeControlDependencyGraphPass(PassRegistry &Registry);
+void initializeProgramDependencyGraphPass(PassRegistry &Registry);
 
 // Transformations.
 void initializeHelloLLVMPass(PassRegistry &Registry);

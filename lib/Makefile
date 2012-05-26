@@ -9,6 +9,6 @@ LEVEL = ..
 # List all of the subdirectories that we will compile.
 #
 DIRS = InstructionCount HelloLLVM FunctionEraser DataDependencyGraph \
-       ControlDependencyGraph
+       ControlDependencyGraph ProgramDependencyGraph
 
 include $(LEVEL)/Makefile.common
