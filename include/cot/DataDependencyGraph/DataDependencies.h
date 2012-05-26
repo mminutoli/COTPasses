@@ -26,7 +26,6 @@
 
 namespace cot {
 
-using namespace llvm;
 
 /*!
  * Data Dependency Graph Node
@@ -49,15 +48,15 @@ public:
 
 };
 
-class DataDependencyGraph : public FunctionPass
+class DataDependencyGraph : public llvm::FunctionPass
 {
 public:
   static char ID; // Pass ID, replacement for typeid
-  DataDependencyGraphBase<BasicBlock>* DDT;
+  DataDependencyGraphBase<llvm::BasicBlock>* DDT;
 
   DataDependencyGraph() : FunctionPass(ID)
   {
-    DDT = new DataDependencyGraphBase<BasicBlock>();
+    DDT = new DataDependencyGraphBase<llvm::BasicBlock>();
   }
 
   ~DataDependencyGraph()
@@ -65,9 +64,9 @@ public:
     delete DDT;
   }
 
-  virtual bool runOnFunction(Function &F);
+  virtual bool runOnFunction(llvm::Function &F);
 
-  virtual void getAnalysisUsage(AnalysisUsage &AU) const;
+  virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const;
 
   virtual const char *getPassName() const
   {

@@ -23,6 +23,7 @@
 
 
 using namespace cot;
+using namespace llvm;
 
 
 char DataDependencyGraph::ID = 0;
