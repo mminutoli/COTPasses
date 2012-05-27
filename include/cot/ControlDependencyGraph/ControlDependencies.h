@@ -42,8 +42,8 @@ public:
 
   iterator begin() { return Neighbours.begin(); }
   iterator end() { return Neighbours.end(); }
-  const_iterator begin() { return Neighbours.begin(); }
-  const_iterator end() { return Neighbours.end(); }
+  const_iterator begin() const { return Neighbours.begin(); }
+  const_iterator end() const { return Neighbours.end(); }
 
   NodeT *getBlock() const { return TheBB; }
 
