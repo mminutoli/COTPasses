@@ -22,6 +22,8 @@
 #define CONTROLDEPENDENCIES_H
 
 #include "llvm/Pass.h"
+#include "llvm/ADT/DepthFirstIterator.h"
+#include "llvm/ADT/GraphTraits.h"
 #include "llvm/Support/raw_ostream.h"
 
 namespace cot {
@@ -97,6 +99,50 @@ public:
   }
 };
 
+
+typedef ControlDependencyNodeBase<llvm::BasicBlock> ControlDepGraphNode;
+
 }
+
+namespace llvm {
+/*!
+ * ControlDependencyGraph GraphTraits specialization. This will make
+ * the Graph iterable by the generic graph iterators.
+ */
+template <> struct GraphTraits<cot::ControlDepGraphNode*>
+{
+  typedef cot::ControlDepGraphNode NodeType;
+  typedef NodeType::iterator ChildIteratorType;
+
+  static NodeType *getEntryNode(NodeType *N) {
+    return N;
+  }
+  static inline ChildIteratorType child_begin(NodeType *N) {
+    return N->begin();
+  }
+  static inline ChildIteratorType child_end(NodeType *N) {
+    return N->end();
+  }
+
+  typedef df_iterator<NodeType*> nodes_iterator;
+
+  static nodes_iterator nodes_begin(NodeType *N) {
+    return df_begin(getEntryNode(N));
+  }
+
+  static nodes_iterator nodes_end(NodeType *N) {
+    return df_end(getEntryNode(N));
+  }
+};
+
+
+template <> struct GraphTraits<cot::ControlDependencyGraph*>
+  : public llvm::GraphTraits<cot::ControlDepGraphNode*>
+{
+
+};
+
+}
+
 
 #endif // CONTROLDEPENDENCIES_H
