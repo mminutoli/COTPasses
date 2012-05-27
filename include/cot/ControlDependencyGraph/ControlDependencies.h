@@ -22,6 +22,7 @@
 #define CONTROLDEPENDENCIES_H
 
 #include "llvm/Pass.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace cot {
 
@@ -32,11 +33,31 @@ template <class NodeT>
 class ControlDependencyNodeBase
 {
 public:
+  typedef typename std::vector<ControlDependencyNodeBase<NodeT> *>::iterator
+                   iterator;
+  typedef typename std::vector<ControlDependencyNodeBase<NodeT> *>::const_iterator
+                   const_iterator;
+
+  iterator begin() { return Neighbours.begin(); }
+  iterator end() { return Neighbours.end(); }
+  const_iterator begin() { return Neighbours.begin(); }
+  const_iterator end() { return Neighbours.end(); }
+
+  NodeT *getBlock() const { return TheBB; }
 
 private:
   NodeT *TheBB;
   std::vector<ControlDependencyNodeBase<NodeT> *> Neighbours;
 };
+
+
+template <class NodeT>
+static llvm::raw_ostream &
+operator<<(llvm::raw_ostream &o, const ControlDependencyNodeBase<NodeT> *Node)
+{
+  o << "ToDo: Print information of nodes.";
+  return o << "\n";
+}
 
 
 /*!
