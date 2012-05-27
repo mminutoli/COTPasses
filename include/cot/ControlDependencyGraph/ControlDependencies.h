@@ -68,8 +68,14 @@ operator<<(llvm::raw_ostream &o, const ControlDependencyNodeBase<NodeT> *Node)
 template <class NodeT>
 class ControlDependencyGraphBase
 {
+private:
+  ControlDependencyNodeBase<NodeT> *ANode;
 public:
-
+  void print(llvm::raw_ostream &o)
+  {
+    o << "=============================--------------------------------\n";
+    o << "Control Dependency Graph: \n";
+  }
 };
 
 
@@ -97,6 +103,8 @@ public:
   {
     return "Control Dependency Graph";
   }
+
+  void print(llvm::raw_ostream &OS, const llvm::Module* M= 0) const;
 };
 
 

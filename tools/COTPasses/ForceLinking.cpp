@@ -29,6 +29,7 @@ public:
     CreateInstructionCountPass();
     CreateDataDependencyGraphPass();
     CreateControlDependencyGraphPass();
+    CreateControlDependencyGraphPrinterPass();
     CreateProgramDependencyGraphPass();
 
     // Transformations.
@@ -52,9 +53,11 @@ public:
     initializeDataDependencyGraphPass(Registry);
     initializeControlDependencyGraphPass(Registry);
     initializeProgramDependencyGraphPass(Registry);
+
     // Transformations.
     initializeHelloLLVMPass(Registry);
     initializeFunctionEraserPass(Registry);
+    initializeControlDependencyGraphPrinterPass(Registry);
   }
 };
 

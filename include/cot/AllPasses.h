@@ -25,6 +25,7 @@ ProgramDependencyGraph *CreateProgramDependencyGraphPass();
 // Transformations.
 llvm::Pass *CreateHelloLLVMPass();
 llvm::Pass *CreateFunctionEraserPass();
+llvm::Pass *CreateControlDependencyGraphPrinterPass();
 
 } // End namespace cot.
 
@@ -41,6 +42,7 @@ void initializeProgramDependencyGraphPass(PassRegistry &Registry);
 // Transformations.
 void initializeHelloLLVMPass(PassRegistry &Registry);
 void initializeFunctionEraserPass(PassRegistry &Registry);
+void initializeControlDependencyGraphPrinterPass(PassRegistry &Registry);
 
 } // End namespace llvm.
 

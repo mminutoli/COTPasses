@@ -42,6 +42,12 @@ void ControlDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
 }
 
 
+void ControlDependencyGraph::print(raw_ostream &o, const Module*) const
+{
+  CDG->print(o);
+}
+
+
 ControlDependencyGraph *CreateControlDependencyGraphPass()
 {
   return new ControlDependencyGraph();
@@ -52,3 +58,39 @@ INITIALIZE_PASS(ControlDependencyGraph, "cdgraph",
                 "Control Dependency Graph Contruction",
                 true,
                 true)
+
+
+/*!
+ * Control Dependency Graph Printer Pass
+ */
+namespace {
+class ControlDependencyGraphPrinter : public FunctionPass
+{
+public:
+  static char ID; // Pass identification, replacement for typeid
+  ControlDependencyGraphPrinter() : FunctionPass(ID) {}
+
+  void getAnalysisUsage(AnalysisUsage &AU) const
+  {
+    AU.setPreservesAll();
+    AU.addRequired<ControlDependencyGraph>();
+  }
+
+  bool runOnFunction(Function &F)
+  {
+    getAnalysis<ControlDependencyGraph>().dump();
+    return false;
+  }
+};
+}
+
+char ControlDependencyGraphPrinter::ID = 0;
+INITIALIZE_PASS(ControlDependencyGraphPrinter, "print-cdg",
+                "Print Control Dependency Graph",
+                true,
+                true)
+
+Pass *CreateControlDependencyGraphPrinterPass()
+{
+  return new ControlDependencyGraphPrinter();
+}
