@@ -11,20 +11,16 @@
 // returning a llvm::Pass * you have to return a pointer to the analysis class.
 namespace cot {
 
-class InstructionCount;
 class DataDependencyGraph;
 class ControlDependencyGraph;
 class ProgramDependencyGraph;
 
 // Analysis.
-InstructionCount *CreateInstructionCountPass();
 DataDependencyGraph *CreateDataDependencyGraphPass();
 ControlDependencyGraph *CreateControlDependencyGraphPass();
 ProgramDependencyGraph *CreateProgramDependencyGraphPass();
 
 // Transformations.
-llvm::Pass *CreateHelloLLVMPass();
-llvm::Pass *CreateFunctionEraserPass();
 llvm::Pass *CreateControlDependencyGraphPrinterPass();
 
 } // End namespace cot.
@@ -34,14 +30,11 @@ namespace llvm {
 class PassRegistry;
 
 // Analysis.
-void initializeInstructionCountPass(PassRegistry &Registry);
 void initializeDataDependencyGraphPass(PassRegistry &Registry);
 void initializeControlDependencyGraphPass(PassRegistry &Registry);
 void initializeProgramDependencyGraphPass(PassRegistry &Registry);
 
 // Transformations.
-void initializeHelloLLVMPass(PassRegistry &Registry);
-void initializeFunctionEraserPass(PassRegistry &Registry);
 void initializeControlDependencyGraphPrinterPass(PassRegistry &Registry);
 
 } // End namespace llvm.

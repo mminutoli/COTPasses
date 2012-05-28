@@ -26,15 +26,11 @@ public:
       return;
 
     // Analysis.
-    CreateInstructionCountPass();
-    CreateDataDependencyGraphPass();
     CreateControlDependencyGraphPass();
     CreateControlDependencyGraphPrinterPass();
     CreateProgramDependencyGraphPass();
 
     // Transformations.
-    CreateHelloLLVMPass();
-    CreateFunctionEraserPass();
   }
 };
 
@@ -49,14 +45,11 @@ public:
     llvm::PassRegistry &Registry = *llvm::PassRegistry::getPassRegistry();
 
     // Analysis.
-    initializeInstructionCountPass(Registry);
     initializeDataDependencyGraphPass(Registry);
     initializeControlDependencyGraphPass(Registry);
     initializeProgramDependencyGraphPass(Registry);
 
     // Transformations.
-    initializeHelloLLVMPass(Registry);
-    initializeFunctionEraserPass(Registry);
     initializeControlDependencyGraphPrinterPass(Registry);
   }
 };
