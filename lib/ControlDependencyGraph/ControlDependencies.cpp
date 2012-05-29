@@ -41,9 +41,9 @@ void ControlDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
 }
 
 
-void ControlDependencyGraph::print(raw_ostream &o, const Module*) const
+void ControlDependencyGraph::print(raw_ostream &OS, const Module*) const
 {
-  CDG->print(o);
+  CDG->print(OS, getPassName());
 }
 
 

@@ -28,29 +28,20 @@
 
 namespace cot
 {
+  typedef DependencyGraph<llvm::BasicBlock> ControlDepGraph;
+
   /*!
    * Control Dependency Graph
    */
-  class ControlDependencyGraphBase : public DependencyGraph<llvm::BasicBlock>
-  {
-  public:
-
-    void print(llvm::raw_ostream &o)
-    {
-      o << "=============================--------------------------------\n";
-      o << "Control Dependency Graph: \n";
-    }
-  };
-
   class ControlDependencyGraph : public llvm::FunctionPass
   {
   public:
     static char ID; // Pass ID, replacement for typeid
-    ControlDependencyGraphBase *CDG;
+    ControlDepGraph *CDG;
 
     ControlDependencyGraph() : llvm::FunctionPass(ID)
     {
-      CDG = new ControlDependencyGraphBase();
+      CDG = new ControlDepGraph();
     }
 
     ~ControlDependencyGraph()

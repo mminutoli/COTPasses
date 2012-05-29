@@ -26,15 +26,26 @@
 
 namespace cot
 {
+  typedef DependencyGraph<llvm::BasicBlock> DataDepGraph;
 
+  /*!
+   * Data Dependency Graph
+   */
   class DataDependencyGraph : public llvm::FunctionPass
   {
   public:
     static char ID; // Pass ID, replacement for typeid
+    DataDepGraph *DDG;
 
-    DataDependencyGraph() : FunctionPass(ID) { }
+    DataDependencyGraph() : FunctionPass(ID)
+    {
+      DDG = new DataDepGraph();
+    }
 
-    ~DataDependencyGraph() { }
+    ~DataDependencyGraph()
+    {
+      delete DDG;
+    }
 
     virtual bool runOnFunction(llvm::Function &F);
 
@@ -44,6 +55,8 @@ namespace cot
     {
       return "Data Dependency Graph";
     }
+
+    virtual void print(llvm::raw_ostream &OS, const llvm::Module* M = 0) const;
   };
 
 }

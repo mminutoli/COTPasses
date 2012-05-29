@@ -20,6 +20,7 @@
 #define DEPENDENCYGRAPH_H_
 
 #include "llvm/ADT/GraphTraits.h"
+#include "llvm/Support/raw_ostream.h"
 #include <map>
 #include <set>
 
@@ -120,6 +121,12 @@ namespace cot
     const_nodes_iterator end_children() const
     {
       return const_nodes_iterator(mNodes.end());
+    }
+
+    void print(llvm::raw_ostream &OS, const char *PN) const
+    {
+      OS << "=============================--------------------------------\n";
+      OS << PN << ": \n";
     }
 
   private:

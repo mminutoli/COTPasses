@@ -22,41 +22,24 @@
 #define PROGRAMDEPENDENCIES_H
 
 #include "llvm/Pass.h"
-
+#include "cot/Common/DependencyGraph.h"
 
 namespace cot {
 
+typedef DependencyGraph<llvm::BasicBlock> ProgramDepGraph;
+
 /*!
- * Program Dependencies Graph Node
+ * Program Dependencies Graph
  */
-template <class NodeT>
-class ProgramDependencyGraphNodeBase
-{
-public:
-
-private:
-  NodeT *TheBB;
-  std::vector<ProgramDependencyGraphNodeBase<NodeT> *> Neighbours;
-};
-
-
-template <class NodeT>
-class ProgramDependencyGraphBase
-{
-public:
-
-};
-
-
 class ProgramDependencyGraph : public llvm::FunctionPass
 {
 public:
   static char ID; // Pass ID, replacement for typeid
-  ProgramDependencyGraphBase<llvm::BasicBlock> *PDG;
+  ProgramDepGraph *PDG;
 
   ProgramDependencyGraph() : llvm::FunctionPass(ID)
   {
-    PDG = new ProgramDependencyGraphBase<llvm::BasicBlock>();
+    PDG = new ProgramDepGraph();
   }
 
   ~ProgramDependencyGraph()
@@ -72,6 +55,8 @@ public:
   {
     return "Program Dependency Graph";
   }
+
+  void print(llvm::raw_ostream &OS, const llvm::Module* M = 0) const;
 };
 
 }

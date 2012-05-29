@@ -32,7 +32,6 @@ char ProgramDependencyGraph::ID = 0;
 
 bool ProgramDependencyGraph::runOnFunction(Function &F)
 {
-  errs() << "Run PDG construction\n";
   return false;
 }
 
@@ -42,6 +41,12 @@ void ProgramDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
   AU.setPreservesAll();
 }
 
+
+
+void ProgramDependencyGraph::print(llvm::raw_ostream &OS, const llvm::Module*) const
+{
+  PDG->print(OS, getPassName());
+}
 
 ProgramDependencyGraph *CreateProgramDependencyGraphPass()
 {

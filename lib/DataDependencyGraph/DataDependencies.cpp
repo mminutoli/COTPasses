@@ -31,20 +31,24 @@ char DataDependencyGraph::ID = 0;
 
 bool DataDependencyGraph::runOnFunction(llvm::Function &F)
 {
-   // Just as a test link every basic block with everything :)
-   DependencyGraph<llvm::BasicBlock> graph;
    for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it)
       for (Function::BasicBlockListType::const_iterator it2 = F.getBasicBlockList().begin(); it2 != F.getBasicBlockList().end(); ++it2)
-         graph.addDependency(&*it, &*it2, DEPENDENCY_TYPE_DATA);
-
-   errs() << "Run DDG construction\n";
+         DDG->addDependency(&*it, &*it2, DEPENDENCY_TYPE_DATA);
    return false;
 }
+
 
 void DataDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
 {
    AU.setPreservesAll();
 }
+
+
+void DataDependencyGraph::print(raw_ostream &OS, const Module*) const
+{
+  DDG->print(OS, getPassName());
+}
+
 
 DataDependencyGraph *cot::CreateDataDependencyGraphPass()
 {
