@@ -55,6 +55,8 @@ namespace cot
         it = mDependencies.insert(it, typename DependencyMap::value_type(pNode, type));
     }
 
+    const T *getData() { return mpData; }
+
   private:
     typedef std::map<DependencyNode<T>*, DependencyType> DependencyMap;
 
@@ -127,6 +129,8 @@ namespace cot
     {
       OS << "=============================--------------------------------\n";
       OS << PN << ": \n";
+      for (nodes_iterator it = begin_children(); it != end_children(); ++it)
+        OS << "<nodo>" << "\n";
     }
 
   private:
