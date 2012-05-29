@@ -22,57 +22,29 @@
 #define DATADEPENDENCIES_H
 
 #include "llvm/Pass.h"
+#include "cot/Common/DependencyGraph.h"
 
-
-namespace cot {
-
-
-/*!
- * Data Dependency Graph Node
- */
-template <class NodeT>
-class DataDependencyGraphNodeBase
+namespace cot
 {
-public:
 
-private:
-  NodeT *TheBB;
-  std::vector<DataDependencyGraphNodeBase<NodeT> *> Neighbours;
-};
-
-
-template <class NodeT>
-class DataDependencyGraphBase
-{
-public:
-
-};
-
-class DataDependencyGraph : public llvm::FunctionPass
-{
-public:
-  static char ID; // Pass ID, replacement for typeid
-  DataDependencyGraphBase<llvm::BasicBlock>* DDT;
-
-  DataDependencyGraph() : FunctionPass(ID)
+  class DataDependencyGraph : public llvm::FunctionPass
   {
-    DDT = new DataDependencyGraphBase<llvm::BasicBlock>();
-  }
+  public:
+    static char ID; // Pass ID, replacement for typeid
 
-  ~DataDependencyGraph()
-  {
-    delete DDT;
-  }
+    DataDependencyGraph() : FunctionPass(ID) { }
 
-  virtual bool runOnFunction(llvm::Function &F);
+    ~DataDependencyGraph() { }
 
-  virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const;
+    virtual bool runOnFunction(llvm::Function &F);
 
-  virtual const char *getPassName() const
-  {
-    return "Data Dependency Graph";
-  }
-};
+    virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const;
+
+    virtual const char *getPassName() const
+    {
+      return "Data Dependency Graph";
+    }
+  };
 
 }
 

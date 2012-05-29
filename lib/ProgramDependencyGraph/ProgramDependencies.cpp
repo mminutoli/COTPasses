@@ -43,7 +43,7 @@ void ProgramDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
 }
 
 
-ProgramDependencyGraph *CerateProgramDependencyGraphPass()
+ProgramDependencyGraph *CreateProgramDependencyGraphPass()
 {
   return new ProgramDependencyGraph();
 }
