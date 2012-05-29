@@ -27,7 +27,7 @@ public:
 
     // Analysis.
     CreateControlDependencyGraphPass();
-    CreateControlDependencyGraphPrinterPass();
+    CreateDataDependencyGraphPass();
     CreateProgramDependencyGraphPass();
 
     // Transformations.
@@ -50,7 +50,6 @@ public:
     initializeProgramDependencyGraphPass(Registry);
 
     // Transformations.
-    initializeControlDependencyGraphPrinterPass(Registry);
   }
 };
 

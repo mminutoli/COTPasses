@@ -22,71 +22,17 @@
 #define CONTROLDEPENDENCIES_H
 
 #include "llvm/Pass.h"
+#include "cot/Common/DependencyGraph.h"
 #include "llvm/ADT/DepthFirstIterator.h"
-#include "llvm/ADT/GraphTraits.h"
 #include "llvm/Support/raw_ostream.h"
 
 namespace cot
 {
-
-  /*!
-   * Control Dependency Graph Node
-   */
-  template <class NodeT>
-  class ControlDependencyNodeBase
-  {
-  public:
-    typedef typename std::vector<ControlDependencyNodeBase<NodeT> *>::iterator
-    iterator;
-    typedef typename std::vector<ControlDependencyNodeBase<NodeT> *>::const_iterator
-    const_iterator;
-
-    iterator begin()
-    {
-      return Neighbours.begin();
-    }
-
-    iterator end()
-    {
-      return Neighbours.end();
-    }
-
-    const_iterator begin() const
-    {
-      return Neighbours.begin();
-    }
-
-    const_iterator end() const
-    {
-      return Neighbours.end();
-    }
-
-    NodeT *getBlock() const
-    {
-      return TheBB;
-    }
-
-  private:
-    NodeT *TheBB;
-    std::vector<ControlDependencyNodeBase<NodeT> *> Neighbours;
-  };
-
-  template <class NodeT>
-  static llvm::raw_ostream &
-  operator<<(llvm::raw_ostream &o, const ControlDependencyNodeBase<NodeT> *Node)
-  {
-    o << "ToDo: Print information of nodes.";
-    return o << "\n";
-  }
-
   /*!
    * Control Dependency Graph
    */
-  template <class NodeT>
-  class ControlDependencyGraphBase
+  class ControlDependencyGraphBase : public DependencyGraph<llvm::BasicBlock>
   {
-  private:
-    ControlDependencyNodeBase<NodeT> *ANode;
   public:
 
     void print(llvm::raw_ostream &o)
@@ -100,11 +46,11 @@ namespace cot
   {
   public:
     static char ID; // Pass ID, replacement for typeid
-    ControlDependencyGraphBase<llvm::BasicBlock> *CDG;
+    ControlDependencyGraphBase *CDG;
 
     ControlDependencyGraph() : llvm::FunctionPass(ID)
     {
-      CDG = new ControlDependencyGraphBase<llvm::BasicBlock > ();
+      CDG = new ControlDependencyGraphBase();
     }
 
     ~ControlDependencyGraph()
@@ -123,58 +69,6 @@ namespace cot
 
     void print(llvm::raw_ostream &OS, const llvm::Module* M = 0) const;
   };
-
-
-  typedef ControlDependencyNodeBase<llvm::BasicBlock> ControlDepGraphNode;
-
 }
-
-namespace llvm
-{
-
-  /*!
-   * ControlDependencyGraph GraphTraits specialization. This will make
-   * the Graph iterable by the generic graph iterators.
-   */
-  template <> struct GraphTraits<cot::ControlDepGraphNode*>
-  {
-    typedef cot::ControlDepGraphNode NodeType;
-    typedef NodeType::iterator ChildIteratorType;
-
-    static NodeType * getEntryNode(NodeType * N)
-    {
-      return N;
-    }
-
-    static inline ChildIteratorType child_begin(NodeType * N)
-    {
-      return N->begin();
-    }
-
-    static inline ChildIteratorType child_end(NodeType * N)
-    {
-      return N->end();
-    }
-
-    typedef df_iterator<NodeType*> nodes_iterator;
-
-    static nodes_iterator nodes_begin(NodeType * N)
-    {
-      return df_begin(getEntryNode(N));
-    }
-
-    static nodes_iterator nodes_end(NodeType * N)
-    {
-      return df_end(getEntryNode(N));
-    }
-  };
-
-  template <> struct GraphTraits<cot::ControlDependencyGraph*>
-  : public llvm::GraphTraits<cot::ControlDepGraphNode*>
-  {
-  };
-
-}
-
 
 #endif // CONTROLDEPENDENCIES_H
