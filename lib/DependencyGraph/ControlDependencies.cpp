@@ -16,7 +16,7 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#include "cot/ControlDependencyGraph/ControlDependencies.h"
+#include "cot/DependencyGraph/ControlDependencies.h"
 
 #include "cot/AllPasses.h"
 #include "llvm/Support/raw_ostream.h"

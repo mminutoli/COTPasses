@@ -16,7 +16,7 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
-#include "cot/DataDependencyGraph/DataDependencies.h"
+#include "cot/DependencyGraph/DataDependencies.h"
 
 #include "cot/AllPasses.h"
 #include "llvm/Support/raw_ostream.h"

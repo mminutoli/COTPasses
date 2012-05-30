@@ -17,7 +17,7 @@
  */
 
 
-#include "cot/ProgramDependencyGraph/ProgramDependencies.h"
+#include "cot/DependencyGraph/ProgramDependencies.h"
 
 #include "cot/AllPasses.h"
 #include "llvm/Support/raw_ostream.h"

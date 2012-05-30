@@ -22,7 +22,7 @@
 #define PROGRAMDEPENDENCIES_H
 
 #include "llvm/Pass.h"
-#include "cot/Common/DependencyGraph.h"
+#include "cot/DependencyGraph/DependencyGraph.h"
 
 namespace cot {
 

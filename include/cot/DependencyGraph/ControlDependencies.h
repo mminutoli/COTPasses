@@ -1,4 +1,4 @@
-/** ---*- C++ -*--- DataDependencies.h
+/** ---*- C++ -*--- ControlDependencies.h
  *
  * Copyright (C) 2012 Marco Minutoli <mminutoli@gmail.com>
  *
@@ -18,47 +18,48 @@
 
 
 
-#ifndef DATADEPENDENCIES_H
-#define DATADEPENDENCIES_H
+#ifndef CONTROLDEPENDENCIES_H
+#define CONTROLDEPENDENCIES_H
 
 #include "llvm/Pass.h"
-#include "cot/Common/DependencyGraph.h"
+#include "cot/DependencyGraph/DependencyGraph.h"
+#include "llvm/ADT/DepthFirstIterator.h"
+#include "llvm/Support/raw_ostream.h"
 
 namespace cot
 {
-  typedef DependencyGraph<llvm::BasicBlock> DataDepGraph;
+  typedef DependencyGraph<llvm::BasicBlock> ControlDepGraph;
 
   /*!
-   * Data Dependency Graph
+   * Control Dependency Graph
    */
-  class DataDependencyGraph : public llvm::FunctionPass
+  class ControlDependencyGraph : public llvm::FunctionPass
   {
   public:
     static char ID; // Pass ID, replacement for typeid
-    DataDepGraph *DDG;
+    ControlDepGraph *CDG;
 
-    DataDependencyGraph() : FunctionPass(ID)
+    ControlDependencyGraph() : llvm::FunctionPass(ID)
     {
-      DDG = new DataDepGraph();
+      CDG = new ControlDepGraph();
     }
 
-    ~DataDependencyGraph()
+    ~ControlDependencyGraph()
     {
-      delete DDG;
+      delete CDG;
     }
 
-    virtual bool runOnFunction(llvm::Function &F);
+    bool runOnFunction(llvm::Function &F);
 
-    virtual void getAnalysisUsage(llvm::AnalysisUsage &AU) const;
+    void getAnalysisUsage(llvm::AnalysisUsage &AU) const;
 
-    virtual const char *getPassName() const
+    const char *getPassName() const
     {
-      return "Data Dependency Graph";
+      return "Control Dependency Graph";
     }
 
-    virtual void print(llvm::raw_ostream &OS, const llvm::Module* M = 0) const;
+    void print(llvm::raw_ostream &OS, const llvm::Module* M = 0) const;
   };
-
 }
 
-#endif // DATADEPENDENCIES_H
+#endif // CONTROLDEPENDENCIES_H
