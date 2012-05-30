@@ -1,4 +1,4 @@
-##===- lib/DataDependencyGraph/Makefile --------------------*- Makefile -*-===##
+##===- lib/DependencyGraph/Makefile ------------------------*- Makefile -*-===##
 
 #
 # Indicate where we are relative to the top of the source tree.
@@ -8,7 +8,7 @@ LEVEL = ../..
 #
 # Give the name of a library.  This will build a dynamic version.
 #
-LIBRARYNAME = cotDataDependencyGraph
+LIBRARYNAME = cotDependencyGraph
 
 #
 # Include Makefile.common so we know what to do.
