@@ -129,8 +129,9 @@ namespace cot
     {
       OS << "=============================--------------------------------\n";
       OS << PN << ": \n";
-      for (nodes_iterator it = begin_children(); it != end_children(); ++it)
-        OS << "<nodo>" << "\n";
+      const_nodes_iterator firstNode = begin_children();
+      if (firstNode != end_children())
+        PrintDependencyTree(OS, getNodeByData((*firstNode)->getData()));
     }
 
   private:
@@ -139,6 +140,30 @@ namespace cot
     NodeSet mNodes;
     DataToNodeMap mDataToNode;
   };
+
+
+  /*!
+   * Overloaded operator that pretty print a DependencyNode
+   */
+  template<class NodeT>
+  static llvm::raw_ostream &operator<<(llvm::raw_ostream &o,
+                                       const DependencyNode<NodeT> *N)
+  {
+    o << " <<node>>";
+    return o << "\n";
+  }
+
+
+  /*!
+   * Print function.
+   * Traverse in depth-first the DependencyGraph and print nodes.
+   */
+  template<class NodeT>
+  static void PrintDependencyTree(llvm::raw_ostream &o,
+                                  const DependencyNode<NodeT> *N)
+  {
+    o << N;
+  }
 }
 
 #endif // DEPENDENCYGRAPH_H_
