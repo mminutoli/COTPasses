@@ -38,8 +38,14 @@ namespace cot
   class DependencyNode
   {
   public:
+    typedef typename std::map<DependencyNode<T> *, DependencyType>::iterator iterator;
+    typedef typename std::map<DependencyNode<T> *, DependencyType>::const_iterator
+                     const_iterator;
 
-  public:
+    iterator begin() { return mpData->begin(); }
+    iterator end() { return mpData->end(); }
+    const_iterator begin() const { return mpData->begin(); }
+    const_iterator end() const { return mpData->end(); }
 
     DependencyNode(const T* pData) :
     mpData(pData) { }
