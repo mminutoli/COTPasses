@@ -29,9 +29,8 @@ namespace cot
 
   enum DependencyType
   {
-    DEPENDENCY_TYPE_CONTROL,
-    DEPENDENCY_TYPE_DATA,
-    DEPENDENCY_TYPE_DATA_AND_CONTROL
+    CONTROL,
+    DATA
   };
 
   template <class T = llvm::BasicBlock>
