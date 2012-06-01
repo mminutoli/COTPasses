@@ -38,9 +38,8 @@ namespace cot
   class DependencyNode
   {
   public:
-    typedef typename std::map<DependencyNode<T> *, DependencyType>::iterator iterator;
-    typedef typename std::map<DependencyNode<T> *, DependencyType>::const_iterator
-                     const_iterator;
+    typedef typename std::vector<std::pair<DependencyNode<T> *, DependencyType> >::iterator iterator;
+    typedef typename std::vector<std::pair<DependencyNode<T> *, DependencyType> >::const_iterator const_iterator;
 
     iterator begin() { return mpData->begin(); }
     iterator end() { return mpData->end(); }
@@ -52,22 +51,18 @@ namespace cot
 
     void addDependencyTo(DependencyNode<T>* pNode, DependencyType type)
     {
-      typename DependencyMap::iterator it = mDependencies.find(pNode);
-      if (it != mDependencies.end())
-      {
-        if (type != it->second)
-          it->second = DEPENDENCY_TYPE_DATA_AND_CONTROL;
-      } else
-        it = mDependencies.insert(it, typename DependencyMap::value_type(pNode, type));
+      DependencyLink link = DependencyLink(pNode, type);
+      mDependencies.push_back(link);
     }
 
     const T *getData() { return mpData; }
 
   private:
-    typedef std::map<DependencyNode<T>*, DependencyType> DependencyMap;
+    typedef std::pair<DependencyNode<T> *, DependencyType> DependencyLink;
+    typedef std::vector<DependencyLink> DependencyLinkList;
 
     const T* mpData;
-    DependencyMap mDependencies;
+    DependencyLinkList mDependencies;
   };
 
   /////////////////////////////////////////////////////////////////////////////
