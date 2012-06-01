@@ -33,59 +33,59 @@ namespace cot
     DATA
   };
 
-  template <class T = llvm::BasicBlock>
+  template <class NodeT = llvm::BasicBlock>
   class DependencyNode
   {
   public:
-    typedef typename std::vector<std::pair<DependencyNode<T> *, DependencyType> >::iterator iterator;
-    typedef typename std::vector<std::pair<DependencyNode<T> *, DependencyType> >::const_iterator const_iterator;
+    typedef typename std::vector<std::pair<DependencyNode<NodeT> *, DependencyType> >::iterator iterator;
+    typedef typename std::vector<std::pair<DependencyNode<NodeT> *, DependencyType> >::const_iterator const_iterator;
 
     iterator begin() { return mpData->begin(); }
     iterator end() { return mpData->end(); }
     const_iterator begin() const { return mpData->begin(); }
     const_iterator end() const { return mpData->end(); }
 
-    DependencyNode(const T* pData) :
+    DependencyNode(const NodeT* pData) :
     mpData(pData) { }
 
-    void addDependencyTo(DependencyNode<T>* pNode, DependencyType type)
+    void addDependencyTo(DependencyNode<NodeT>* pNode, DependencyType type)
     {
       DependencyLink link = DependencyLink(pNode, type);
       mDependencies.push_back(link);
     }
 
-    const T *getData() { return mpData; }
+    const NodeT *getData() { return mpData; }
 
   private:
-    typedef std::pair<DependencyNode<T> *, DependencyType> DependencyLink;
+    typedef std::pair<DependencyNode<NodeT> *, DependencyType> DependencyLink;
     typedef std::vector<DependencyLink> DependencyLinkList;
 
-    const T* mpData;
+    const NodeT* mpData;
     DependencyLinkList mDependencies;
   };
 
   /////////////////////////////////////////////////////////////////////////////
 
-  template <class T = llvm::BasicBlock>
+  template <class NodeT = llvm::BasicBlock>
   class DependencyGraph
   {
   public:
-    typedef typename std::set<DependencyNode<T>* >::iterator nodes_iterator;
-    typedef typename std::set<DependencyNode<T>* >::const_iterator const_nodes_iterator;
+    typedef typename std::set<DependencyNode<NodeT>* >::iterator nodes_iterator;
+    typedef typename std::set<DependencyNode<NodeT>* >::const_iterator const_nodes_iterator;
 
-    DependencyNode<T>* getNodeByData(const T* pData)
+    DependencyNode<NodeT>* getNodeByData(const NodeT* pData)
     {
       typename DataToNodeMap::iterator it = mDataToNode.find(pData);
       if (it == mDataToNode.end())
       {
         it = mDataToNode.insert(it, typename DataToNodeMap::value_type(pData,
-                new DependencyNode<T > (pData)));
+                new DependencyNode<NodeT > (pData)));
         mNodes.insert(it->second);
       }
       return it->second;
     }
 
-    const DependencyNode<T>* getNodeByData(const T* pData) const
+    const DependencyNode<NodeT>* getNodeByData(const NodeT* pData) const
     {
       typename DataToNodeMap::const_iterator it = mDataToNode.find(pData);
       if (it == mDataToNode.end())
@@ -97,11 +97,11 @@ namespace cot
       return it->second;
     }
 
-    void addDependency(const T* pDependent, const T* pDepency,
+    void addDependency(const NodeT* pDependent, const NodeT* pDepency,
             DependencyType type)
     {
-      DependencyNode<T>* pFrom = getNodeByData(pDependent);
-      DependencyNode<T>* pTo = getNodeByData(pDepency);
+      DependencyNode<NodeT>* pFrom = getNodeByData(pDependent);
+      DependencyNode<NodeT>* pTo = getNodeByData(pDepency);
       pFrom->addDependencyTo(pTo, type);
     }
 
@@ -135,8 +135,8 @@ namespace cot
     }
 
   private:
-    typedef std::set<DependencyNode<T>* > NodeSet;
-    typedef std::map<const T*, DependencyNode<T>*> DataToNodeMap;
+    typedef std::set<DependencyNode<NodeT>* > NodeSet;
+    typedef std::map<const NodeT*, DependencyNode<NodeT>*> DataToNodeMap;
     NodeSet mNodes;
     DataToNodeMap mDataToNode;
   };
