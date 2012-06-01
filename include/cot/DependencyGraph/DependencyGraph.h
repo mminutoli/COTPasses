@@ -21,6 +21,8 @@
 
 #include "llvm/ADT/GraphTraits.h"
 #include "llvm/Support/raw_ostream.h"
+
+#include <iterator>
 #include <map>
 #include <set>
 
@@ -33,17 +35,36 @@ namespace cot
     DATA
   };
 
+  template <class NodeT> class DependencyLinkIterator;
+
   template <class NodeT = llvm::BasicBlock>
   class DependencyNode
   {
   public:
-    typedef typename std::vector<std::pair<DependencyNode<NodeT> *, DependencyType> >::iterator iterator;
-    typedef typename std::vector<std::pair<DependencyNode<NodeT> *, DependencyType> >::const_iterator const_iterator;
+    typedef std::pair<DependencyNode<NodeT> *, DependencyType> DependencyLink;
+    typedef std::vector<DependencyLink> DependencyLinkList;
+    typedef DependencyLinkIterator<NodeT> iterator;
+    typedef DependencyLinkIterator<NodeT> const_iterator;
 
-    iterator begin() { return mpData->begin(); }
-    iterator end() { return mpData->end(); }
-    const_iterator begin() const { return mpData->begin(); }
-    const_iterator end() const { return mpData->end(); }
+    iterator begin()
+    {
+      return new DependencyLinkIterator<NodeT>(mDependencies.begin());
+    }
+
+    iterator end()
+    {
+      return new DependencyLinkIterator<NodeT>(mDependencies.end());
+    }
+
+    const_iterator begin() const
+    {
+      return new DependencyLinkIterator<NodeT>(mDependencies.begin());
+    }
+
+    const_iterator end() const
+    {
+      return new DependencyLinkIterator<NodeT>(mDependencies.end());
+    }
 
     DependencyNode(const NodeT* pData) :
     mpData(pData) { }
@@ -57,11 +78,59 @@ namespace cot
     const NodeT *getData() { return mpData; }
 
   private:
-    typedef std::pair<DependencyNode<NodeT> *, DependencyType> DependencyLink;
-    typedef std::vector<DependencyLink> DependencyLinkList;
-
     const NodeT* mpData;
     DependencyLinkList mDependencies;
+  };
+
+
+  template <class NodeT = llvm::BasicBlock>
+  class DependencyLinkIterator
+      : std::iterator<std::input_iterator_tag, NodeT>
+  {
+    typedef typename DependencyNode<NodeT>::DependecyLinkedList::iterator
+                     InnerIterator;
+  public:
+    DependencyLinkIterator() : itr() {}
+
+    DependencyLinkIterator(const InnerIterator &r)
+        : itr(r) {}
+
+    DependencyLinkIterator<NodeT> &operator++()
+    {
+      ++itr;
+      return *this;
+    }
+
+    NodeT *operator->()
+    {
+      typename DependencyNode<NodeT>::DependencyLink L = *itr;
+      return L.first;
+    }
+
+    NodeT operator*()
+    {
+      typename DependencyNode<NodeT>::DependecyLink L = *itr;
+      return *(L.first);
+    }
+
+    bool operator!=(const DependencyLinkIterator &r)
+    {
+      return itr != r.itr;
+    }
+
+    bool operator==(const DependencyLinkIterator &r)
+    {
+      return itr == r.itr;
+    }
+
+    DependencyType getDependencyType() const
+    {
+      typename DependencyNode<NodeT>::DependencyLink L = *itr;
+      return L.second;
+    }
+
+  private:
+    InnerIterator itr;
   };
 
   /////////////////////////////////////////////////////////////////////////////
