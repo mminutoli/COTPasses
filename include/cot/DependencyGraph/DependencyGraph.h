@@ -19,6 +19,7 @@
 #ifndef DEPENDENCYGRAPH_H_
 #define DEPENDENCYGRAPH_H_
 
+#include "llvm/ADT/DepthFirstIterator.h"
 #include "llvm/ADT/GraphTraits.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -48,22 +49,22 @@ namespace cot
 
     iterator begin()
     {
-      return new DependencyLinkIterator<NodeT>(mDependencies.begin());
+      return DependencyLinkIterator<NodeT>(mDependencies.begin());
     }
 
     iterator end()
     {
-      return new DependencyLinkIterator<NodeT>(mDependencies.end());
+      return DependencyLinkIterator<NodeT>(mDependencies.end());
     }
 
     const_iterator begin() const
     {
-      return new DependencyLinkIterator<NodeT>(mDependencies.begin());
+      return DependencyLinkIterator<NodeT>(mDependencies.begin());
     }
 
     const_iterator end() const
     {
-      return new DependencyLinkIterator<NodeT>(mDependencies.end());
+      return DependencyLinkIterator<NodeT>(mDependencies.end());
     }
 
     DependencyNode(const NodeT* pData) :
@@ -82,12 +83,13 @@ namespace cot
     DependencyLinkList mDependencies;
   };
 
+  typedef DependencyNode<llvm::BasicBlock> DepGraphNode;
 
   template <class NodeT = llvm::BasicBlock>
   class DependencyLinkIterator
       : std::iterator<std::input_iterator_tag, NodeT>
   {
-    typedef typename DependencyNode<NodeT>::DependecyLinkedList::iterator
+    typedef typename DependencyNode<NodeT>::DependencyLinkList::iterator
                      InnerIterator;
   public:
     DependencyLinkIterator() : itr() {}
@@ -210,6 +212,8 @@ namespace cot
     DataToNodeMap mDataToNode;
   };
 
+  typedef DependencyGraph<llvm::BasicBlock> DepGraph;
+
 
   /*!
    * Overloaded operator that pretty print a DependencyNode
@@ -233,6 +237,54 @@ namespace cot
   {
     o << N;
   }
+}
+
+
+namespace llvm
+{
+
+template <> struct GraphTraits<cot::DepGraphNode*>
+{
+  typedef cot::DepGraphNode   NodeType;
+  typedef NodeType::iterator  ChildIteratorType;
+
+  static NodeType *getEntryNode(NodeType *N) {
+    return N;
+  }
+  static inline ChildIteratorType child_begin(NodeType *N) {
+    return N->begin();
+  }
+  static inline ChildIteratorType child_end(NodeType *N) {
+    return N->end();
+  }
+
+  typedef df_iterator<cot::DepGraphNode*> nodes_iterator;
+
+  static nodes_iterator nodes_begin(cot::DepGraphNode *N) {
+    return df_begin(getEntryNode(N));
+  }
+
+  static nodes_iterator nodes_end(cot::DepGraphNode *N) {
+    return df_end(getEntryNode(N));
+  }
+};
+
+
+template <> struct GraphTraits<cot::DepGraph*>
+    : public GraphTraits<cot::DepGraphNode*> {
+  static NodeType *getEntryNode(cot::DepGraph *DT) {
+    return *(DT->begin_children());
+  }
+
+  static nodes_iterator nodes_begin(cot::DepGraph *N) {
+    return df_begin(getEntryNode(N));
+  }
+
+  static nodes_iterator nodes_end(cot::DepGraph *N) {
+    return df_end(getEntryNode(N));
+  }
+};
+
 }
 
 #endif // DEPENDENCYGRAPH_H_
