@@ -249,13 +249,6 @@ namespace cot
   static void PrintDependencyTree(llvm::raw_ostream &o,
                                   const DependencyGraph<NodeT> *G)
   {
-    typename DependencyGraph<NodeT>::nodes_iterator itr = G->begin_children();
-    typename DependencyGraph<NodeT>::nodes_iterator end = G->end_children();
-    for (;itr != end; ++itr)
-    {
-      o << *itr;
-    }
-
     llvm::df_iterator<DependencyNode<NodeT> *> I = df_begin(*(G->begin_children()));
     llvm::df_iterator<DependencyNode<NodeT> *> E = df_end(*(G->end_children()));
     for (; I != E; ++I)
