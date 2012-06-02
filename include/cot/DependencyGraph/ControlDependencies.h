@@ -21,8 +21,8 @@
 #ifndef CONTROLDEPENDENCIES_H
 #define CONTROLDEPENDENCIES_H
 
-#include "llvm/Pass.h"
 #include "cot/DependencyGraph/DependencyGraph.h"
+#include "llvm/Pass.h"
 #include "llvm/ADT/DepthFirstIterator.h"
 #include "llvm/Support/raw_ostream.h"
 

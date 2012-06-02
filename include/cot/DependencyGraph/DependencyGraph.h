@@ -19,9 +19,12 @@
 #ifndef DEPENDENCYGRAPH_H_
 #define DEPENDENCYGRAPH_H_
 
+#include "llvm/BasicBlock.h"
+#include "llvm/Assembly/Writer.h"
 #include "llvm/ADT/DepthFirstIterator.h"
 #include "llvm/ADT/GraphTraits.h"
 #include "llvm/Support/raw_ostream.h"
+
 
 #include <iterator>
 #include <map>
@@ -76,7 +79,7 @@ namespace cot
       mDependencies.push_back(link);
     }
 
-    const NodeT *getData() { return mpData; }
+    const NodeT *getData() const { return mpData; }
 
   private:
     const NodeT* mpData;
@@ -103,26 +106,34 @@ namespace cot
       return *this;
     }
 
-    NodeT *operator->()
+    DependencyLinkIterator<NodeT> operator++(int)
+    {
+      DependencyLinkIterator<NodeT> old = *this;
+      ++itr;
+      return old;
+    }
+
+
+    DependencyNode<NodeT> *operator->()
     {
       typename DependencyNode<NodeT>::DependencyLink L = *itr;
       return L.first;
     }
 
-    NodeT operator*()
+    DependencyNode<NodeT> *operator*()
     {
-      typename DependencyNode<NodeT>::DependecyLink L = *itr;
-      return *(L.first);
+      typename DependencyNode<NodeT>::DependencyLink L = *itr;
+      return L.first;
     }
 
-    bool operator!=(const DependencyLinkIterator &r)
+    bool operator!=(const DependencyLinkIterator &r) const
     {
       return itr != r.itr;
     }
 
-    bool operator==(const DependencyLinkIterator &r)
+    bool operator==(const DependencyLinkIterator &r) const
     {
-      return itr == r.itr;
+      return !(operator!=(r));
     }
 
     DependencyType getDependencyType() const
@@ -202,7 +213,7 @@ namespace cot
       OS << PN << ": \n";
       const_nodes_iterator firstNode = begin_children();
       if (firstNode != end_children())
-        PrintDependencyTree(OS, getNodeByData((*firstNode)->getData()));
+        PrintDependencyTree(OS, this);
     }
 
   private:
@@ -222,7 +233,10 @@ namespace cot
   static llvm::raw_ostream &operator<<(llvm::raw_ostream &o,
                                        const DependencyNode<NodeT> *N)
   {
-    o << " <<node>>";
+    o.indent(2);
+    const NodeT *block = N->getData();
+    if (block)
+      WriteAsOperand(o, block, false);
     return o << "\n";
   }
 
@@ -233,9 +247,21 @@ namespace cot
    */
   template<class NodeT>
   static void PrintDependencyTree(llvm::raw_ostream &o,
-                                  const DependencyNode<NodeT> *N)
+                                  const DependencyGraph<NodeT> *G)
   {
-    o << N;
+    typename DependencyGraph<NodeT>::nodes_iterator itr = G->begin_children();
+    typename DependencyGraph<NodeT>::nodes_iterator end = G->end_children();
+    for (;itr != end; ++itr)
+    {
+      o << *itr;
+    }
+
+    llvm::df_iterator<DependencyNode<NodeT> *> I = df_begin(*(G->begin_children()));
+    llvm::df_iterator<DependencyNode<NodeT> *> E = df_end(*(G->end_children()));
+    for (; I != E; ++I)
+    {
+      o << *I;
+    }
   }
 }
 
@@ -270,7 +296,7 @@ template <> struct GraphTraits<cot::DepGraphNode*>
 };
 
 
-template <> struct GraphTraits<cot::DepGraph*>
+template <> struct GraphTraits<cot::DepGraph *>
     : public GraphTraits<cot::DepGraphNode*> {
   static NodeType *getEntryNode(cot::DepGraph *DT) {
     return *(DT->begin_children());
