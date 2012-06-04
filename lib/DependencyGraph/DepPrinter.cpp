@@ -63,3 +63,23 @@ struct DataDependencyViewer
 char DataDependencyViewer::ID = 0;
 INITIALIZE_PASS(DataDependencyViewer, "view-ddg",
                 "View data dependency graph of function", false, false)
+
+
+namespace cot
+{
+namespace {
+struct DataDependencyPrinter
+    : public DOTGraphTraitsPrinter<DataDependencyGraph, false>
+{
+  static char ID;
+  DataDependencyPrinter()
+      : DOTGraphTraitsPrinter<DataDependencyGraph, false>("ddgragh", ID) {}
+};
+}
+}
+
+
+char DataDependencyPrinter::ID = 0;
+INITIALIZE_PASS(DataDependencyPrinter, "dot-ddg",
+                "Print data dependency graph of function to 'dot' file",
+                false, false)

@@ -50,6 +50,7 @@ public:
     initializeProgramDependencyGraphPass(Registry);
 
     initializeDataDependencyViewerPass(Registry);
+    initializeDataDependencyPrinterPass(Registry);
     // Transformations.
   }
 };
