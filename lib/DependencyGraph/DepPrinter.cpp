@@ -33,6 +33,18 @@ template <>
 struct DOTGraphTraits<cot::DepGraphNode *> : public DefaultDOTGraphTraits {
   DOTGraphTraits (bool isSimple = false)
       : DefaultDOTGraphTraits(isSimple) {}
+
+  std::string getNodeLabel(cot::DepGraphNode *Node, cot::DepGraphNode *Graph)
+  {
+    const BasicBlock *BB = Node->getData();
+
+    if (isSimple())
+      return DOTGraphTraits<const Function *>
+          ::getSimpleNodeLabel(BB, BB->getParent());
+    else
+      return DOTGraphTraits<const Function *>
+          ::getCompleteNodeLabel(BB, BB->getParent());
+  }
 };
 
 template <>
@@ -41,8 +53,34 @@ struct DOTGraphTraits<cot::DepGraph *>
 {
   DOTGraphTraits (bool isSimple = false)
       : DOTGraphTraits<cot::DepGraphNode *>(isSimple) {}
+
+  std::string getNodeLabel(cot::DepGraphNode *Node, cot::DepGraph *Graph)
+  {
+    return DOTGraphTraits<DepGraphNode *>
+        ::getNodeLabel(Node,*(Graph->begin_children()));
+  }
 };
 
+
+template <>
+struct DOTGraphTraits<cot::DataDependencyGraph *>
+    : public DOTGraphTraits<cot::DepGraph *>
+{
+  DOTGraphTraits (bool isSimple = false)
+      : DOTGraphTraits<cot::DepGraph *>(isSimple) {}
+
+  static std::string getGraphName(DataDependencyGraph *)
+  {
+    return "Data dependency graph";
+  }
+
+  std::string getNodeLabel(cot::DepGraphNode *Node,
+                           cot::DataDependencyGraph *Graph)
+  {
+    return DOTGraphTraits<DepGraph *>
+        ::getNodeLabel(Node, Graph->DDG);
+  }
+};
 }
 
 namespace cot
