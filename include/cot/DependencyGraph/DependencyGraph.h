@@ -92,7 +92,7 @@ namespace cot
   class DependencyLinkIterator
       : std::iterator<std::input_iterator_tag, NodeT>
   {
-    typedef typename DependencyNode<NodeT>::DependencyLinkList::iterator
+    typedef typename DependencyNode<NodeT>::DependencyLinkList::const_iterator
                      InnerIterator;
   public:
     DependencyLinkIterator() : itr() {}
@@ -233,10 +233,20 @@ namespace cot
   static llvm::raw_ostream &operator<<(llvm::raw_ostream &o,
                                        const DependencyNode<NodeT> *N)
   {
-    o.indent(2);
     const NodeT *block = N->getData();
     if (block)
+    {
       WriteAsOperand(o, block, false);
+      o << " { ";
+      typename DependencyNode<NodeT>::const_iterator I = N->begin();
+      typename DependencyNode<NodeT>::const_iterator E = N->end();
+      for (; I != E; ++I)
+      {
+        WriteAsOperand(o, (*I)->getData(), false);
+        o << ":" << I.getDependencyType() << " ";
+      }
+      o << "}";
+    }
     return o << "\n";
   }
 
@@ -253,7 +263,9 @@ namespace cot
     llvm::df_iterator<DependencyNode<NodeT> *> E = df_end(*(G->end_children()));
     for (; I != E; ++I)
     {
-      o << *I;
+      int pathLength = I.getPathLength();
+      o.indent(pathLength + 2);
+      o << "[" << pathLength << "] "<< *I;
     }
   }
 }
