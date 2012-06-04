@@ -90,7 +90,7 @@ namespace cot
 
   template <class NodeT = llvm::BasicBlock>
   class DependencyLinkIterator
-      : std::iterator<std::input_iterator_tag, NodeT>
+      : public std::iterator<std::input_iterator_tag, NodeT>
   {
     typedef typename DependencyNode<NodeT>::DependencyLinkList::const_iterator
                      InnerIterator;

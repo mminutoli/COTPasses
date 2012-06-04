@@ -33,6 +33,7 @@ void initializeDataDependencyGraphPass(PassRegistry &Registry);
 void initializeControlDependencyGraphPass(PassRegistry &Registry);
 void initializeProgramDependencyGraphPass(PassRegistry &Registry);
 
+void initializeDataDependencyViewerPass(PassRegistry &Registry);
 // Transformations.
 
 } // End namespace llvm.

@@ -49,6 +49,7 @@ public:
     initializeControlDependencyGraphPass(Registry);
     initializeProgramDependencyGraphPass(Registry);
 
+    initializeDataDependencyViewerPass(Registry);
     // Transformations.
   }
 };

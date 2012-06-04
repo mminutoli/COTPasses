@@ -61,4 +61,24 @@ namespace cot
 
 }
 
+namespace llvm
+{
+
+  template <> struct GraphTraits<cot::DataDependencyGraph *>
+      : public GraphTraits<cot::DepGraphNode*> {
+    static NodeType *getEntryNode(cot::DataDependencyGraph *DG) {
+      return *(DG->DDG->begin_children());
+    }
+
+    static nodes_iterator nodes_begin(cot::DataDependencyGraph *N) {
+      return df_begin(getEntryNode(N));
+    }
+
+    static nodes_iterator nodes_end(cot::DataDependencyGraph *N) {
+      return df_end(getEntryNode(N));
+    }
+  };
+
+}
+
 #endif // DATADEPENDENCIES_H
