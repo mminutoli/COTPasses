@@ -33,8 +33,15 @@ void initializeDataDependencyGraphPass(PassRegistry &Registry);
 void initializeControlDependencyGraphPass(PassRegistry &Registry);
 void initializeProgramDependencyGraphPass(PassRegistry &Registry);
 
+// Dot viewer passes
 void initializeDataDependencyViewerPass(PassRegistry &Registry);
+void initializeControlDependencyViewerPass(PassRegistry &Registry);
+void initializeProgramDependencyViewerPass(PassRegistry &Registry);
+
+// Dot printer passes
 void initializeDataDependencyPrinterPass(PassRegistry &Registry);
+void initializeControlDependencyPrinterPass(PassRegistry &Registry);
+void initializeProgramDependencyPrinterPass(PassRegistry &Registry);
 // Transformations.
 
 } // End namespace llvm.

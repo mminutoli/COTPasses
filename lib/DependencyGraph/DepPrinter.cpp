@@ -20,6 +20,8 @@
 
 #include "cot/AllPasses.h"
 #include "cot/DependencyGraph/DataDependencies.h"
+#include "cot/DependencyGraph/ControlDependencies.h"
+#include "cot/DependencyGraph/ProgramDependencies.h"
 #include "llvm/Analysis/DOTGraphTraitsPass.h"
 
 
@@ -81,6 +83,48 @@ struct DOTGraphTraits<cot::DataDependencyGraph *>
         ::getNodeLabel(Node, Graph->DDG);
   }
 };
+
+
+template <>
+struct DOTGraphTraits<cot::ControlDependencyGraph *>
+    : public DOTGraphTraits<cot::DepGraph *>
+{
+  DOTGraphTraits (bool isSimple = false)
+      : DOTGraphTraits<cot::DepGraph *>(isSimple) {}
+
+  static std::string getGraphName(ControlDependencyGraph *)
+  {
+    return "Control dependency graph";
+  }
+
+  std::string getNodeLabel(cot::DepGraphNode *Node,
+                           cot::ControlDependencyGraph *Graph)
+  {
+    return DOTGraphTraits<DepGraph *>
+        ::getNodeLabel(Node, Graph->CDG);
+  }
+};
+
+
+template <>
+struct DOTGraphTraits<cot::ProgramDependencyGraph *>
+    : public DOTGraphTraits<cot::DepGraph *>
+{
+  DOTGraphTraits (bool isSimple = false)
+      : DOTGraphTraits<cot::DepGraph *>(isSimple) {}
+
+  static std::string getGraphName(ProgramDependencyGraph *)
+  {
+    return "Program dependency graph";
+  }
+
+  std::string getNodeLabel(cot::DepGraphNode *Node,
+                           cot::ProgramDependencyGraph *Graph)
+  {
+    return DOTGraphTraits<DepGraph *>
+        ::getNodeLabel(Node, Graph->PDG);
+  }
+};
 }
 
 namespace cot
@@ -94,6 +138,24 @@ struct DataDependencyViewer
   DataDependencyViewer() :
       DOTGraphTraitsViewer<DataDependencyGraph, false>("ddgraph", ID) {}
 };
+
+
+struct ControlDependencyViewer
+    : public DOTGraphTraitsViewer<ControlDependencyGraph, false>
+{
+  static char ID;
+  ControlDependencyViewer() :
+      DOTGraphTraitsViewer<ControlDependencyGraph, false>("cdgraph", ID) {}
+};
+
+
+struct ProgramDependencyViewer
+    : public DOTGraphTraitsViewer<ProgramDependencyGraph, false>
+{
+  static char ID;
+  ProgramDependencyViewer() :
+      DOTGraphTraitsViewer<ProgramDependencyGraph, false>("pdgraph", ID) {}
+};
 }
 
 }
@@ -101,6 +163,14 @@ struct DataDependencyViewer
 char DataDependencyViewer::ID = 0;
 INITIALIZE_PASS(DataDependencyViewer, "view-ddg",
                 "View data dependency graph of function", false, false)
+
+char ControlDependencyViewer::ID = 0;
+INITIALIZE_PASS(ControlDependencyViewer, "view-cdg",
+                "View control dependency graph of function", false, false)
+
+char ProgramDependencyViewer::ID = 0;
+INITIALIZE_PASS(ProgramDependencyViewer, "view-pdg",
+                "View program dependency graph of function", false, false)
 
 
 namespace cot
@@ -113,6 +183,24 @@ struct DataDependencyPrinter
   DataDependencyPrinter()
       : DOTGraphTraitsPrinter<DataDependencyGraph, false>("ddgragh", ID) {}
 };
+
+
+struct ControlDependencyPrinter
+    : public DOTGraphTraitsPrinter<ControlDependencyGraph, false>
+{
+  static char ID;
+  ControlDependencyPrinter()
+      : DOTGraphTraitsPrinter<ControlDependencyGraph, false>("cdgragh", ID) {}
+};
+
+
+struct ProgramDependencyPrinter
+    : public DOTGraphTraitsPrinter<ProgramDependencyGraph, false>
+{
+  static char ID;
+  ProgramDependencyPrinter()
+      : DOTGraphTraitsPrinter<ProgramDependencyGraph, false>("pdgragh", ID) {}
+};
 }
 }
 
@@ -120,4 +208,14 @@ struct DataDependencyPrinter
 char DataDependencyPrinter::ID = 0;
 INITIALIZE_PASS(DataDependencyPrinter, "dot-ddg",
                 "Print data dependency graph of function to 'dot' file",
+                false, false)
+
+char ControlDependencyPrinter::ID = 0;
+INITIALIZE_PASS(ControlDependencyPrinter, "dot-cdg",
+                "Print control dependency graph of function to 'dot' file",
+                false, false)
+
+char ProgramDependencyPrinter::ID = 0;
+INITIALIZE_PASS(ProgramDependencyPrinter, "dot-pdg",
+                "Print program dependency graph of function to 'dot' file",
                 false, false)

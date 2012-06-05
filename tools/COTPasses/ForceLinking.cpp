@@ -49,8 +49,16 @@ public:
     initializeControlDependencyGraphPass(Registry);
     initializeProgramDependencyGraphPass(Registry);
 
+    // Dot Viewer Passes
     initializeDataDependencyViewerPass(Registry);
+    initializeControlDependencyViewerPass(Registry);
+    initializeProgramDependencyViewerPass(Registry);
+
+    // Dot Printer Passes
     initializeDataDependencyPrinterPass(Registry);
+    initializeControlDependencyPrinterPass(Registry);
+    initializeProgramDependencyPrinterPass(Registry);
+
     // Transformations.
   }
 };

@@ -19,6 +19,7 @@
 #include "cot/DependencyGraph/ControlDependencies.h"
 
 #include "cot/AllPasses.h"
+#include "llvm/Function.h"
 #include "llvm/Support/raw_ostream.h"
 
 
@@ -31,6 +32,9 @@ char ControlDependencyGraph::ID = 0;
 
 bool ControlDependencyGraph::runOnFunction(Function &F)
 {
+  for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it)
+    for (Function::BasicBlockListType::const_iterator it2 = F.getBasicBlockList().begin(); it2 != F.getBasicBlockList().end(); ++it2)
+      CDG->addDependency(&*it, &*it2, DATA);
   return false;
 }
 

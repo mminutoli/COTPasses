@@ -20,6 +20,7 @@
 #include "cot/DependencyGraph/ProgramDependencies.h"
 
 #include "cot/AllPasses.h"
+#include "llvm/Function.h"
 #include "llvm/Support/raw_ostream.h"
 
 
@@ -32,6 +33,9 @@ char ProgramDependencyGraph::ID = 0;
 
 bool ProgramDependencyGraph::runOnFunction(Function &F)
 {
+  for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it)
+    for (Function::BasicBlockListType::const_iterator it2 = F.getBasicBlockList().begin(); it2 != F.getBasicBlockList().end(); ++it2)
+      PDG->addDependency(&*it, &*it2, DATA);
   return false;
 }
 
