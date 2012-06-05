@@ -124,6 +124,14 @@ struct DOTGraphTraits<cot::ProgramDependencyGraph *>
     return DOTGraphTraits<DepGraph *>
         ::getNodeLabel(Node, Graph->PDG);
   }
+
+  std::string getEdgeAttributes(cot::DepGraphNode *Node,
+                                cot::DependencyLinkIterator<> &EI,
+                                cot::ProgramDependencyGraph *PD)
+  {
+    return EI.getDependencyType() == CONTROL ?
+        "style=dotted" : "";
+  }
 };
 }
 
