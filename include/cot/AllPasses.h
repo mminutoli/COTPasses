@@ -19,6 +19,7 @@ class ProgramDependencyGraph;
 DataDependencyGraph *CreateDataDependencyGraphPass();
 ControlDependencyGraph *CreateControlDependencyGraphPass();
 ProgramDependencyGraph *CreateProgramDependencyGraphPass();
+llvm::FunctionPass *CreatePostDomFrontierPass();
 
 // Transformations.
 
@@ -32,6 +33,7 @@ class PassRegistry;
 void initializeDataDependencyGraphPass(PassRegistry &Registry);
 void initializeControlDependencyGraphPass(PassRegistry &Registry);
 void initializeProgramDependencyGraphPass(PassRegistry &Registry);
+void initializePostDominanceFrontierPass(PassRegistry &Registry);
 
 // Dot viewer passes
 void initializeDataDependencyViewerPass(PassRegistry &Registry);

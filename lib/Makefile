@@ -8,6 +8,6 @@ LEVEL = ..
 #
 # List all of the subdirectories that we will compile.
 #
-DIRS = DependencyGraph
+DIRS = DependencyGraph PostDomFrontier
 
 include $(LEVEL)/Makefile.common

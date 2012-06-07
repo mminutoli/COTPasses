@@ -6,6 +6,6 @@ LIBRARYNAME = COTPasses
 
 LOADABLE_MODULE = 1
 
-USEDLIBS = cotDependencyGraph.a
+USEDLIBS = cotDependencyGraph.a cotPostDomFrontier.a
 
 include $(LEVEL)/Makefile.common

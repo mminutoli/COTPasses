@@ -29,6 +29,7 @@ public:
     CreateControlDependencyGraphPass();
     CreateDataDependencyGraphPass();
     CreateProgramDependencyGraphPass();
+    CreatePostDomFrontierPass();
 
     // Transformations.
   }
@@ -48,6 +49,7 @@ public:
     initializeDataDependencyGraphPass(Registry);
     initializeControlDependencyGraphPass(Registry);
     initializeProgramDependencyGraphPass(Registry);
+    initializePostDominanceFrontierPass(Registry);
 
     // Dot Viewer Passes
     initializeDataDependencyViewerPass(Registry);
