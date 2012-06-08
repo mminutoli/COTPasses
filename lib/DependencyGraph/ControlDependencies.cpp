@@ -19,6 +19,7 @@
 #include "cot/DependencyGraph/ControlDependencies.h"
 
 #include "cot/AllPasses.h"
+#include "cot/PostDomFrontier/PostDominanceFrontier.h"
 #include "llvm/Function.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -32,9 +33,30 @@ char ControlDependencyGraph::ID = 0;
 
 bool ControlDependencyGraph::runOnFunction(Function &F)
 {
-  for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it)
-    for (Function::BasicBlockListType::const_iterator it2 = F.getBasicBlockList().begin(); it2 != F.getBasicBlockList().end(); ++it2)
-      CDG->addDependency(&*it, &*it2, DATA);
+  PostDominanceFrontier &PDF = getAnalysis<PostDominanceFrontier>();
+
+  std::vector<BasicBlock *> Roots = PDF.getRoots();
+  if (Roots.size() > 1)
+  {
+    // I want to create a common root but I am not sure this is the way.
+    for (std::vector<BasicBlock *>::const_iterator I = Roots.begin(),
+             E = Roots.end(); I != E; ++I)
+      CDG->addDependency(*I, 0, CONTROL);
+  }
+  for (PostDominanceFrontier::const_iterator I = PDF.begin(), E = PDF.end();
+       I != E; ++I)
+  {
+    const std::set<BasicBlock *> &nodeFrontier = I->second;
+    if (!nodeFrontier.empty())
+    {
+      for (std::set<BasicBlock *>::const_iterator FI = nodeFrontier.begin(),
+               FE = nodeFrontier.end();
+           FI != FE; ++FI)
+      {
+        CDG->addDependency(*FI, I->first, CONTROL);
+      }
+    }
+  }
   return false;
 }
 
@@ -42,6 +64,7 @@ bool ControlDependencyGraph::runOnFunction(Function &F)
 void ControlDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
 {
   AU.setPreservesAll();
+  AU.addRequired<PostDominanceFrontier>();
 }
 
 
