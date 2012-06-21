@@ -19,8 +19,9 @@
 #include "cot/DependencyGraph/ControlDependencies.h"
 
 #include "cot/AllPasses.h"
-#include "cot/PostDomFrontier/PostDominanceFrontier.h"
 #include "llvm/Function.h"
+#include "llvm/Instructions.h"
+#include "llvm/Analysis/PostDominators.h"
 #include "llvm/Support/raw_ostream.h"
 
 
@@ -28,33 +29,64 @@ using namespace cot;
 using namespace llvm;
 
 
+static bool buildPath(DomTreeNode *root, DomTreeNode *dest,
+                      std::vector<BasicBlock *> &path)
+{
+  if (root == dest) return true;
+
+  bool found = false;
+  for (DomTreeNode::iterator I = root->begin(), E = root->end();
+       !found && I != E; ++I)
+  {
+    path.push_back((*I)->getBlock());
+    found = buildPath(*I, dest, path);
+    if (!found) path.pop_back();
+  }
+
+  return found;
+}
+
+
 char ControlDependencyGraph::ID = 0;
 
 
 bool ControlDependencyGraph::runOnFunction(Function &F)
 {
-  PostDominanceFrontier &PDF = getAnalysis<PostDominanceFrontier>();
+  PostDominatorTree &PDT = getAnalysis<PostDominatorTree>();
 
-  std::vector<BasicBlock *> Roots = PDF.getRoots();
-  if (Roots.size() > 1)
+  std::vector<std::pair<BasicBlock *, BasicBlock *> > EdgeSet;
+
+  // The code commented out below is a desperate attempt to add a node
+  // to the CFG in a way that shold make the algorithm work properly.
+  /*
+  BasicBlock * Start = BasicBlock::Create(F.getContext(), "START", &F);
+  BranchInst::Create(Start, &F.getEntryBlock());
+  EdgeSet.push_back(std::make_pair(Start, &F.getEntryBlock()));
+  */
+  PDT.DT->addNewBlock(Start, PDT.DT->getRoot());
+  for (Function::iterator I = F.begin(), E = F.end(); I != E; ++I)
   {
-    // I want to create a common root but I am not sure this is the way.
-    for (std::vector<BasicBlock *>::const_iterator I = Roots.begin(),
-             E = Roots.end(); I != E; ++I)
-      CDG->addDependency(*I, 0, CONTROL);
-  }
-  for (PostDominanceFrontier::const_iterator I = PDF.begin(), E = PDF.end();
-       I != E; ++I)
-  {
-    const std::set<BasicBlock *> &nodeFrontier = I->second;
-    if (!nodeFrontier.empty())
+    for (succ_iterator SI = succ_begin(I), SE = succ_end(I); SI != SE; ++SI)
     {
-      for (std::set<BasicBlock *>::const_iterator FI = nodeFrontier.begin(),
-               FE = nodeFrontier.end();
-           FI != FE; ++FI)
-      {
-        CDG->addDependency(*FI, I->first, CONTROL);
-      }
+      if (!PDT.properlyDominates(*SI, I))
+        EdgeSet.push_back(std::make_pair(I, *SI));
+    }
+  }
+
+  typedef std::vector<std::pair<BasicBlock *, BasicBlock *> >::iterator EdgeItr;
+  for (EdgeItr I = EdgeSet.begin(), E = EdgeSet.end(); I != E; ++I)
+  {
+    std::pair<BasicBlock *, BasicBlock *> Edge = *I;
+    BasicBlock *BB = PDT.findNearestCommonDominator(Edge.first, Edge.second);
+
+    std::vector<BasicBlock *> path;
+    bool found = buildPath(PDT.getNode(BB), PDT.getNode(Edge.second), path);
+
+    while (found && !path.empty())
+    {
+      BasicBlock * node = path.back();
+      CDG->addDependency(Edge.first, node, CONTROL);
+      path.pop_back();
     }
   }
   return false;
@@ -64,7 +96,7 @@ bool ControlDependencyGraph::runOnFunction(Function &F)
 void ControlDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
 {
   AU.setPreservesAll();
-  AU.addRequired<PostDominanceFrontier>();
+  AU.addRequired<PostDominatorTree>();
 }
 
 
