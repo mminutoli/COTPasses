@@ -29,24 +29,6 @@ using namespace cot;
 using namespace llvm;
 
 
-static bool buildPath(DomTreeNode *root, DomTreeNode *dest,
-                      std::vector<BasicBlock *> &path)
-{
-  if (root == dest) return true;
-
-  bool found = false;
-  for (DomTreeNode::iterator I = root->begin(), E = root->end();
-       !found && I != E; ++I)
-  {
-    path.push_back((*I)->getBlock());
-    found = buildPath(*I, dest, path);
-    if (!found) path.pop_back();
-  }
-
-  return found;
-}
-
-
 char ControlDependencyGraph::ID = 0;
 
 
@@ -54,12 +36,21 @@ bool ControlDependencyGraph::runOnFunction(Function &F)
 {
   PostDominatorTree &PDT = getAnalysis<PostDominatorTree>();
 
-  DomTreeNode *domNode = PDT[&F.getEntryBlock()];
-  while (domNode && domNode->getBlock())
+  /*
+   * The EdgeSet should always contains the Start->EntryNode
+   * edge. This will lead to add every node in the path from the
+   * ExitNode(the immediate postdom of Start) and the EntryNode as
+   * control dependent on Start.
+   */
+  DomTreeNode *entryNode = PDT[&F.getEntryBlock()];
+  while (entryNode && entryNode->getBlock())
   {
+    /*
+     * Walking the path backward and adding dependencies.
+     */
     CDG->addDependency(static_cast<BasicBlock *>(0),
-                       domNode->getBlock(), CONTROL);
-    domNode = domNode->getIDom();
+                       entryNode->getBlock(), CONTROL);
+    entryNode = entryNode->getIDom();
   }
 
   std::vector<std::pair<BasicBlock *, BasicBlock *> > EdgeSet;
@@ -77,14 +68,12 @@ bool ControlDependencyGraph::runOnFunction(Function &F)
   {
     std::pair<BasicBlock *, BasicBlock *> Edge = *I;
     BasicBlock *BB = PDT.findNearestCommonDominator(Edge.first, Edge.second);
-    std::vector<BasicBlock *> path;
-    bool found = buildPath(PDT.getNode(BB), PDT.getNode(Edge.second), path);
 
-    while (found && !path.empty())
+    DomTreeNode *domNode = PDT[Edge.second];
+    while (domNode->getBlock() != BB)
     {
-      BasicBlock * node = path.back();
-      CDG->addDependency(Edge.first, node, CONTROL);
-      path.pop_back();
+      CDG->addDependency(Edge.first, domNode->getBlock(), CONTROL);
+      domNode = domNode->getIDom();
     }
   }
   return false;
