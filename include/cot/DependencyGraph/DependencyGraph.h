@@ -152,8 +152,10 @@ namespace cot
   class DependencyGraph
   {
   public:
-    typedef typename std::set<DependencyNode<NodeT>* >::iterator nodes_iterator;
-    typedef typename std::set<DependencyNode<NodeT>* >::const_iterator const_nodes_iterator;
+    typedef typename std::vector<DependencyNode<NodeT>* >::iterator nodes_iterator;
+    typedef typename std::vector<DependencyNode<NodeT>* >::const_iterator const_nodes_iterator;
+
+    DependencyNode<NodeT>* getRootNode() const { return RootNode; }
 
     DependencyNode<NodeT>* getNodeByData(const NodeT* pData)
     {
@@ -162,7 +164,11 @@ namespace cot
       {
         it = mDataToNode.insert(it, typename DataToNodeMap::value_type(pData,
                 new DependencyNode<NodeT > (pData)));
-        mNodes.insert(it->second);
+        mNodes.push_back(it->second);
+        if (!RootNode)
+        {
+          RootNode = it->second;
+        }
       }
       return it->second;
     }
@@ -217,8 +223,9 @@ namespace cot
     }
 
   private:
-    typedef std::set<DependencyNode<NodeT>* > NodeSet;
+    typedef std::vector<DependencyNode<NodeT>* > NodeSet;
     typedef std::map<const NodeT*, DependencyNode<NodeT>*> DataToNodeMap;
+    DependencyNode<NodeT> *RootNode;
     NodeSet mNodes;
     DataToNodeMap mDataToNode;
   };
@@ -235,18 +242,18 @@ namespace cot
   {
     const NodeT *block = N->getData();
     if (block)
-    {
       WriteAsOperand(o, block, false);
-      o << " { ";
-      typename DependencyNode<NodeT>::const_iterator I = N->begin();
-      typename DependencyNode<NodeT>::const_iterator E = N->end();
-      for (; I != E; ++I)
-      {
-        WriteAsOperand(o, (*I)->getData(), false);
-        o << ":" << I.getDependencyType() << " ";
-      }
-      o << "}";
+    else
+      o << "<<EntryNode>>";
+    o << " { ";
+    typename DependencyNode<NodeT>::const_iterator I = N->begin();
+    typename DependencyNode<NodeT>::const_iterator E = N->end();
+    for (; I != E; ++I)
+    {
+      WriteAsOperand(o, (*I)->getData(), false);
+      o << ":" << I.getDependencyType() << " ";
     }
+    o << "}";
     return o << "\n";
   }
 
@@ -304,11 +311,14 @@ template <> struct GraphTraits<cot::DepGraphNode*>
 template <> struct GraphTraits<cot::DepGraph *>
     : public GraphTraits<cot::DepGraphNode*> {
   static NodeType *getEntryNode(cot::DepGraph *DT) {
-    return *(DT->begin_children());
+    return DT->getRootNode();
   }
 
   static nodes_iterator nodes_begin(cot::DepGraph *N) {
-    return df_begin(getEntryNode(N));
+    if (getEntryNode(N))
+      return df_begin(getEntryNode(N));
+    else
+      return df_end(getEntryNode(N));
   }
 
   static nodes_iterator nodes_end(cot::DepGraph *N) {
