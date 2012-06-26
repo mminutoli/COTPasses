@@ -40,6 +40,8 @@ struct DOTGraphTraits<cot::DepGraphNode *> : public DefaultDOTGraphTraits {
   {
     const BasicBlock *BB = Node->getData();
 
+    if (!BB) return "<<EntryNode>>";
+
     if (isSimple())
       return DOTGraphTraits<const Function *>
           ::getSimpleNodeLabel(BB, BB->getParent());

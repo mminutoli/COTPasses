@@ -54,16 +54,15 @@ bool ControlDependencyGraph::runOnFunction(Function &F)
 {
   PostDominatorTree &PDT = getAnalysis<PostDominatorTree>();
 
-  std::vector<std::pair<BasicBlock *, BasicBlock *> > EdgeSet;
+  DomTreeNode *domNode = PDT[&F.getEntryBlock()];
+  while (domNode && domNode->getBlock())
+  {
+    CDG->addDependency(static_cast<BasicBlock *>(0),
+                       domNode->getBlock(), CONTROL);
+    domNode = domNode->getIDom();
+  }
 
-  // The code commented out below is a desperate attempt to add a node
-  // to the CFG in a way that shold make the algorithm work properly.
-  /*
-  BasicBlock * Start = BasicBlock::Create(F.getContext(), "START", &F);
-  BranchInst::Create(Start, &F.getEntryBlock());
-  EdgeSet.push_back(std::make_pair(Start, &F.getEntryBlock()));
-  */
-  PDT.DT->addNewBlock(Start, PDT.DT->getRoot());
+  std::vector<std::pair<BasicBlock *, BasicBlock *> > EdgeSet;
   for (Function::iterator I = F.begin(), E = F.end(); I != E; ++I)
   {
     for (succ_iterator SI = succ_begin(I), SE = succ_end(I); SI != SE; ++SI)
@@ -78,7 +77,6 @@ bool ControlDependencyGraph::runOnFunction(Function &F)
   {
     std::pair<BasicBlock *, BasicBlock *> Edge = *I;
     BasicBlock *BB = PDT.findNearestCommonDominator(Edge.first, Edge.second);
-
     std::vector<BasicBlock *> path;
     bool found = buildPath(PDT.getNode(BB), PDT.getNode(Edge.second), path);
 
