@@ -19,7 +19,6 @@ class ProgramDependencyGraph;
 DataDependencyGraph *CreateDataDependencyGraphPass();
 ControlDependencyGraph *CreateControlDependencyGraphPass();
 ProgramDependencyGraph *CreateProgramDependencyGraphPass();
-llvm::FunctionPass *CreatePostDomFrontierPass();
 
 // Transformations.
 
