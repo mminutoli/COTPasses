@@ -65,17 +65,17 @@ namespace llvm
 {
 
   template <> struct GraphTraits<cot::ProgramDependencyGraph *>
-      : public GraphTraits<cot::DepGraphNode*> {
+      : public GraphTraits<cot::DepGraph*> {
     static NodeType *getEntryNode(cot::ProgramDependencyGraph *PG) {
       return *(PG->PDG->begin_children());
     }
 
-    static nodes_iterator nodes_begin(cot::ProgramDependencyGraph *N) {
-      return df_begin(getEntryNode(N));
+    static nodes_iterator nodes_begin(cot::ProgramDependencyGraph *PG) {
+      return PG->PDG->begin_children();
     }
 
-    static nodes_iterator nodes_end(cot::ProgramDependencyGraph *N) {
-      return df_end(getEntryNode(N));
+    static nodes_iterator nodes_end(cot::ProgramDependencyGraph *PG) {
+      return PG->PDG->end_children();
     }
   };
 

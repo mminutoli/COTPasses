@@ -296,33 +296,31 @@ template <> struct GraphTraits<cot::DepGraphNode*>
     return N->end();
   }
 
-  typedef df_iterator<cot::DepGraphNode*> nodes_iterator;
+  typedef cot::DepGraphNode::iterator nodes_iterator;
 
   static nodes_iterator nodes_begin(cot::DepGraphNode *N) {
-    return df_begin(getEntryNode(N));
+    return N->begin();
   }
 
   static nodes_iterator nodes_end(cot::DepGraphNode *N) {
-    return df_end(getEntryNode(N));
+    return N->end();
   }
 };
 
 
 template <> struct GraphTraits<cot::DepGraph *>
     : public GraphTraits<cot::DepGraphNode*> {
-  static NodeType *getEntryNode(cot::DepGraph *DT) {
-    return DT->getRootNode();
+  static NodeType *getEntryNode(cot::DepGraph *N) {
+    return *(N->begin_children());
   }
 
+  typedef cot::DepGraph::const_nodes_iterator nodes_iterator;
   static nodes_iterator nodes_begin(cot::DepGraph *N) {
-    if (getEntryNode(N))
-      return df_begin(getEntryNode(N));
-    else
-      return df_end(getEntryNode(N));
+    return N->begin_children();
   }
 
   static nodes_iterator nodes_end(cot::DepGraph *N) {
-    return df_end(getEntryNode(N));
+    return N->end_children();
   }
 };
 

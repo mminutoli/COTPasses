@@ -66,17 +66,17 @@ namespace llvm
 {
 
   template <> struct GraphTraits<cot::ControlDependencyGraph *>
-      : public GraphTraits<cot::DepGraphNode*> {
+      : public GraphTraits<cot::DepGraph*> {
     static NodeType *getEntryNode(cot::ControlDependencyGraph *CG) {
       return *(CG->CDG->begin_children());
     }
 
-    static nodes_iterator nodes_begin(cot::ControlDependencyGraph *N) {
-      return df_begin(getEntryNode(N));
+    static nodes_iterator nodes_begin(cot::ControlDependencyGraph *CG) {
+      return CG->CDG->begin_children();
     }
 
-    static nodes_iterator nodes_end(cot::ControlDependencyGraph *N) {
-      return df_end(getEntryNode(N));
+    static nodes_iterator nodes_end(cot::ControlDependencyGraph *CG) {
+      return CG->CDG->end_children();
     }
   };
 
