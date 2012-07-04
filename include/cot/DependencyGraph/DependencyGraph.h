@@ -76,6 +76,7 @@ namespace cot
     void addDependencyTo(DependencyNode<NodeT>* pNode, DependencyType type)
     {
       DependencyLink link = DependencyLink(pNode, type);
+      if (std::find(mDependencies.begin(), mDependencies.end(), link) == mDependencies.end())
       mDependencies.push_back(link);
     }
 

@@ -31,9 +31,21 @@ char DataDependencyGraph::ID = 0;
 
 bool DataDependencyGraph::runOnFunction(llvm::Function &F)
 {
-   for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it)
-      for (Function::BasicBlockListType::const_iterator it2 = F.getBasicBlockList().begin(); it2 != F.getBasicBlockList().end(); ++it2)
-         DDG->addDependency(&*it, &*it2, DATA);
+   // Data dependency between temporaries. It's easy to detect a DD between
+   // temporaries because LLVM uses the SSA form. So in orderd to detect a DD,
+   // it suffices to find all operands in an instruction of a basic block and
+   // add a dependency between that basic block and the one which contains
+   // the instruction that defines the operand.      
+   for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it) {
+      for (BasicBlock::const_iterator iit = it->begin(); iit != it->end(); ++iit ) {
+         for (Instruction::const_op_iterator cuit = iit->op_begin(); cuit != iit->op_end(); ++cuit) {
+            Instruction* pInstruction = dyn_cast< Instruction>(*cuit);
+            if(pInstruction) {
+               DDG->addDependency(&*it, pInstruction->getParent(), DATA);
+            }
+         }
+      }
+   }
    return false;
 }
 
