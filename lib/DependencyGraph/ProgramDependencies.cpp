@@ -61,7 +61,7 @@ ProgramDependencyGraph *CreateProgramDependencyGraphPass()
 }
 
 
-INITIALIZE_PASS(ProgramDependencyGraph, "pdgraph",
+INITIALIZE_PASS(ProgramDependencyGraph, "pdg",
                 "Program Dependency Graph Construction",
                 true,
                 true)

@@ -1,5 +1,5 @@
 ; RUN: opt -load %projshlibdir/COTPasses.so \
-; RUN:     -analyze -cdgraph                \
+; RUN:     -analyze -cdg                    \
 ; RUN:     -S -o - %s | FileCheck %s
 ; REQUIRES: loadable_module
 
