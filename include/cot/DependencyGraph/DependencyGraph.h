@@ -265,19 +265,16 @@ namespace cot
 
   /*!
    * Print function.
-   * Traverse in depth-first the DependencyGraph and print nodes.
    */
   template<class NodeT>
   static void PrintDependencyTree(llvm::raw_ostream &o,
                                   const DependencyGraph<NodeT> *G)
   {
-    llvm::df_iterator<DependencyNode<NodeT> *> I = df_begin(*(G->begin_children()));
-    llvm::df_iterator<DependencyNode<NodeT> *> E = df_end(*(G->end_children()));
-    for (; I != E; ++I)
+    for (typename DependencyGraph<NodeT>::const_nodes_iterator I = G->begin_children(),
+             E =G->end_children(); I != E; ++I)
     {
-      int pathLength = I.getPathLength();
-      o.indent(pathLength + 2);
-      o << "[" << pathLength << "] "<< *I;
+      o.indent(4);
+      o << *I;
     }
   }
 }
