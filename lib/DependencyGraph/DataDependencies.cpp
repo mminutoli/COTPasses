@@ -21,7 +21,8 @@
 #include "cot/AllPasses.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Function.h"
-
+#include "llvm/Type.h"
+#include "llvm/Analysis/AliasAnalysis.h"
 
 using namespace cot;
 using namespace llvm;
@@ -31,6 +32,8 @@ char DataDependencyGraph::ID = 0;
 
 bool DataDependencyGraph::runOnFunction(llvm::Function &F)
 {
+   AliasAnalysis &aliasAnalysis = getAnalysis<AliasAnalysis>();
+     
    // Data dependency between temporaries. It's easy to detect a DD between
    // temporaries because LLVM uses the SSA form. So in orderd to detect a DD,
    // it suffices to find all operands in an instruction of a basic block and
@@ -38,12 +41,37 @@ bool DataDependencyGraph::runOnFunction(llvm::Function &F)
    // the instruction that defines the operand.      
    for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it) {
       for (BasicBlock::const_iterator iit = it->begin(); iit != it->end(); ++iit ) {
-         for (Instruction::const_op_iterator cuit = iit->op_begin(); cuit != iit->op_end(); ++cuit) {
-            Instruction* pInstruction = dyn_cast< Instruction>(*cuit);
-            if(pInstruction) {
-               DDG->addDependency(&*it, pInstruction->getParent(), DATA);
-            }
+      
+         if(iit->getOpcode() == Instruction::Store)
+         {
+            // store A,B
+            // load A
+            for (Function::BasicBlockListType::const_iterator it2 = F.getBasicBlockList().begin(); it2 != F.getBasicBlockList().end(); ++it2)
+               for (BasicBlock::const_iterator iit2 = it2->begin(); iit2 != it2->end(); ++iit2 ) {
+                  // This load instruction reads from the same memory location written by the original store
+                  if (iit2->getOpcode() == Instruction::Load) {
+                     if (aliasAnalysis.alias(iit->getOperand(1), iit2->getOperand(0)) != AliasAnalysis::NoAlias)
+                        DDG->addDependency(&*it2, &*it, DATA);
+                  }
+                  else if (iit2->getOpcode() == Instruction::Store) {
+                     // Original store instruction reads location written by this location
+                     if (aliasAnalysis.alias(iit->getOperand(0), iit2->getOperand(1)) != AliasAnalysis::NoAlias)
+                        DDG->addDependency(&*it, &*it2, DATA);
+                     // Both stores write in the same memory location
+                     if (aliasAnalysis.alias(iit->getOperand(1), iit2->getOperand(1)) != AliasAnalysis::NoAlias)
+                        DDG->addDependency(&*it, &*it2, DATA);
+                  }
+               }
          }
+         
+         /*
+         for (Instruction::const_op_iterator cuit = iit->op_begin(); cuit != iit->op_end(); ++cuit) {     
+            Instruction* pInstruction = dyn_cast<Instruction>(*cuit);
+            
+            if(pInstruction) {
+               DDG->addDependency(pInstruction->getParent(), &*it, DATA);
+            }
+         }*/
       }
    }
    return false;
@@ -53,6 +81,7 @@ bool DataDependencyGraph::runOnFunction(llvm::Function &F)
 void DataDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
 {
    AU.setPreservesAll();
+   AU.addRequired<AliasAnalysis>();
 }
 
 

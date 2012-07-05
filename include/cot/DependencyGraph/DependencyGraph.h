@@ -75,7 +75,11 @@ namespace cot
 
     void addDependencyTo(DependencyNode<NodeT>* pNode, DependencyType type)
     {
+      // Avoid self-loops.
+      if (pNode == this)
+         return;
       DependencyLink link = DependencyLink(pNode, type);
+      // Avoid double links.
       if (std::find(mDependencies.begin(), mDependencies.end(), link) == mDependencies.end())
       mDependencies.push_back(link);
     }
