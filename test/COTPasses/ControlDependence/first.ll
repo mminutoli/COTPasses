@@ -34,7 +34,7 @@ define i32 @first() nounwind uwtable {
   ret i32 0
 }
 
-;CHECK:      Printing analysis 'Control Dependency Graph Contruction' for function 'first':
+;CHECK:      Printing analysis 'Control Dependency Graph Construction' for function 'first':
 ;CHECK-NEXT: =============================--------------------------------
 ;CHECK-NEXT: Control Dependency Graph: 
 ;CHECK-NEXT:    <<EntryNode>> { %0:0 %1:0 %12:0 }

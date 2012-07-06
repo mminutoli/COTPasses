@@ -26,7 +26,7 @@ define i32 @multiple_exit(i32 %a) nounwind uwtable {
   ret i32 %9
 }
 
-;CHECK:      Printing analysis 'Control Dependency Graph Contruction' for function 'multiple_exit':
+;CHECK:      Printing analysis 'Control Dependency Graph Construction' for function 'multiple_exit':
 ;CHECK-NEXT: =============================--------------------------------
 ;CHECK-NEXT: Control Dependency Graph: 
 ;CHECK-NEXT:    <<EntryNode>> { %0:0 }
