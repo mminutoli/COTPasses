@@ -58,7 +58,6 @@ namespace cot
 
     virtual void print(llvm::raw_ostream &OS, const llvm::Module* M = 0) const;
   };
-
 }
 
 namespace llvm

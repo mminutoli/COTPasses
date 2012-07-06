@@ -23,6 +23,7 @@
 #include "llvm/Function.h"
 #include "llvm/Type.h"
 #include "llvm/Analysis/AliasAnalysis.h"
+#include "llvm/Analysis/MemoryDependenceAnalysis.h"
 
 using namespace cot;
 using namespace llvm;
@@ -32,46 +33,55 @@ char DataDependencyGraph::ID = 0;
 
 bool DataDependencyGraph::runOnFunction(llvm::Function &F)
 {
-   AliasAnalysis &aliasAnalysis = getAnalysis<AliasAnalysis>();
-     
-   // Data dependency between temporaries. It's easy to detect a DD between
-   // temporaries because LLVM uses the SSA form. So in orderd to detect a DD,
-   // it suffices to find all operands in an instruction of a basic block and
-   // add a dependency between that basic block and the one which contains
-   // the instruction that defines the operand.      
-   for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it) {
-      for (BasicBlock::const_iterator iit = it->begin(); iit != it->end(); ++iit ) {
+   //AliasAnalysis &AA = getAnalysis<AliasAnalysis>();
+   MemoryDependenceAnalysis& MDA = getAnalysis<MemoryDependenceAnalysis>();
+   
+   for (Function::BasicBlockListType::iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it) {
+      // Make sure there exists a node for each BB:
+      DDG->getNodeByData(&*it);
       
-         if(iit->getOpcode() == Instruction::Store)
-         {
-            // store A,B
-            // load A
-            for (Function::BasicBlockListType::const_iterator it2 = F.getBasicBlockList().begin(); it2 != F.getBasicBlockList().end(); ++it2)
-               for (BasicBlock::const_iterator iit2 = it2->begin(); iit2 != it2->end(); ++iit2 ) {
-                  // This load instruction reads from the same memory location written by the original store
-                  if (iit2->getOpcode() == Instruction::Load) {
-                     if (aliasAnalysis.alias(iit->getOperand(1), iit2->getOperand(0)) != AliasAnalysis::NoAlias)
-                        DDG->addDependency(&*it2, &*it, DATA);
+      for (BasicBlock::iterator iit = it->begin(); iit != it->end(); ++iit ) {
+         Instruction *pInstruction = dyn_cast<Instruction>(&*iit);
+         if (isa<StoreInst>(pInstruction)) {
+            MemDepResult res = MDA.getDependency(pInstruction);
+            
+            if (res.isDef()) {
+               // There's a depenency with res.getInst()
+               DDG->addDependency(&*it, res.getInst()->getParent(), DATA);
+            } else if (res.isClobber()) {
+               // There might be a dependency with res.getInst(). Let's be
+               // conservative.
+               DDG->addDependency(&*it, res.getInst()->getParent(), DATA);
+            } else {
+               if (res.isUnknown()) {
+                  // No dependencies found.
+               } else if (res.isNonFuncLocal()) {
+                  // There might be some dependencies with extern instructions, but
+                  // we do not care of this eventuality.
+               } else if (res.isNonLocal()) {
+                  // No dependency found in pInstruction's basic block, but there
+                  // might be in others. To be conservative, we'll add a dependency
+                  // with all the other basic blocks thSat contain an instruction
+                  // that accesses memory.
+                  for (Function::BasicBlockListType::iterator it2 = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it2) {
+                     if (&*it2 != &*it)
+                        for (BasicBlock::iterator iit2 = it2->begin(); iit2 != it2->end(); ++iit2) {
+                           if (iit2->mayReadOrWriteMemory())
+                              DDG->addDependency(&*it, &*it2, DATA);
+                        }
                   }
-                  else if (iit2->getOpcode() == Instruction::Store) {
-                     // Original store instruction reads location written by this location
-                     if (aliasAnalysis.alias(iit->getOperand(0), iit2->getOperand(1)) != AliasAnalysis::NoAlias)
-                        DDG->addDependency(&*it, &*it2, DATA);
-                     // Both stores write in the same memory location
-                     if (aliasAnalysis.alias(iit->getOperand(1), iit2->getOperand(1)) != AliasAnalysis::NoAlias)
-                        DDG->addDependency(&*it, &*it2, DATA);
-                  }
-               }
+               } 
+            }
          }
          
-         /*
-         for (Instruction::const_op_iterator cuit = iit->op_begin(); cuit != iit->op_end(); ++cuit) {     
-            Instruction* pInstruction = dyn_cast<Instruction>(*cuit);
-            
-            if(pInstruction) {
+         // Data dependency between temporaries. It's easy to detect a DD between
+         // temporaries because LLVM uses the SSA form. So in orderd to detect a DD,
+         // it suffices to find all operands in an instruction of a basic block and
+         // add a dependency between that basic block and the one which contains
+         // the instruction that defines the operand.      
+         for (Instruction::const_op_iterator cuit = iit->op_begin(); cuit != iit->op_end(); ++cuit)
+            if(Instruction* pInstruction = dyn_cast<Instruction>(*cuit))
                DDG->addDependency(pInstruction->getParent(), &*it, DATA);
-            }
-         }*/
       }
    }
    return false;
@@ -80,8 +90,9 @@ bool DataDependencyGraph::runOnFunction(llvm::Function &F)
 
 void DataDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
 {
+   AU.addRequiredTransitive<AliasAnalysis>();
+   AU.addRequiredTransitive<MemoryDependenceAnalysis>();
    AU.setPreservesAll();
-   AU.addRequired<AliasAnalysis>();
 }
 
 
@@ -95,7 +106,6 @@ DataDependencyGraph *cot::CreateDataDependencyGraphPass()
 {
    return new DataDependencyGraph();
 }
-
 
 INITIALIZE_PASS(DataDependencyGraph, "ddgraph",
         "Data Dependency Graph Construction",
