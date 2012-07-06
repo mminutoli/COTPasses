@@ -107,7 +107,7 @@ DataDependencyGraph *cot::CreateDataDependencyGraphPass()
    return new DataDependencyGraph();
 }
 
-INITIALIZE_PASS(DataDependencyGraph, "ddgraph",
+INITIALIZE_PASS(DataDependencyGraph, "ddg",
         "Data Dependency Graph Construction",
         true,
         true)

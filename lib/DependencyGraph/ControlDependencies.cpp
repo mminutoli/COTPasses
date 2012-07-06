@@ -99,7 +99,7 @@ ControlDependencyGraph *CreateControlDependencyGraphPass()
 }
 
 
-INITIALIZE_PASS(ControlDependencyGraph, "cdgraph",
+INITIALIZE_PASS(ControlDependencyGraph, "cdg",
                 "Control Dependency Graph Contruction",
                 true,
                 true)
