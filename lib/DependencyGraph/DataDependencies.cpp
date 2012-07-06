@@ -36,7 +36,8 @@ bool DataDependencyGraph::runOnFunction(llvm::Function &F)
    //AliasAnalysis &AA = getAnalysis<AliasAnalysis>();
    MemoryDependenceAnalysis& MDA = getAnalysis<MemoryDependenceAnalysis>();
    
-   for (Function::BasicBlockListType::iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it) {
+   for (Function::BasicBlockListType::iterator it = F.getBasicBlockList().begin();
+      it != F.getBasicBlockList().end(); ++it) {
       // Make sure there exists a node for each BB:
       DDG->getNodeByData(&*it);
       
@@ -56,16 +57,19 @@ bool DataDependencyGraph::runOnFunction(llvm::Function &F)
                if (res.isUnknown()) {
                   // No dependencies found.
                } else if (res.isNonFuncLocal()) {
-                  // There might be some dependencies with extern instructions, but
-                  // we do not care of this eventuality.
+                  // There might be some dependencies with extern instructions,
+                  // but we do not care of this eventuality.
                } else if (res.isNonLocal()) {
                   // No dependency found in pInstruction's basic block, but there
                   // might be in others. To be conservative, we'll add a dependency
                   // with all the other basic blocks thSat contain an instruction
                   // that accesses memory.
-                  for (Function::BasicBlockListType::iterator it2 = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it2) {
+                  for (Function::BasicBlockListType::iterator it2 =
+                  F.getBasicBlockList().begin(); it != F.getBasicBlockList().end();
+                  ++it2) {
                      if (&*it2 != &*it)
-                        for (BasicBlock::iterator iit2 = it2->begin(); iit2 != it2->end(); ++iit2) {
+                        for (BasicBlock::iterator iit2 = it2->begin();
+                        iit2 != it2->end(); ++iit2) {
                            if (iit2->mayReadOrWriteMemory())
                               DDG->addDependency(&*it, &*it2, DATA);
                         }
@@ -79,7 +83,8 @@ bool DataDependencyGraph::runOnFunction(llvm::Function &F)
          // it suffices to find all operands in an instruction of a basic block and
          // add a dependency between that basic block and the one which contains
          // the instruction that defines the operand.      
-         for (Instruction::const_op_iterator cuit = iit->op_begin(); cuit != iit->op_end(); ++cuit)
+         for (Instruction::const_op_iterator cuit = iit->op_begin();
+            cuit != iit->op_end(); ++cuit)
             if(Instruction* pInstruction = dyn_cast<Instruction>(*cuit))
                DDG->addDependency(pInstruction->getParent(), &*it, DATA);
       }
