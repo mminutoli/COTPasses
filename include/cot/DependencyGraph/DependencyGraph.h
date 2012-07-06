@@ -86,6 +86,14 @@ namespace cot
 
     const NodeT *getData() const { return mpData; }
 
+    bool dependsFrom(const DependencyNode<NodeT>* pNode) const {
+      for(typename DependencyLinkList::const_iterator it = mDependencies.begin();
+          it != mDependencies.end();
+          ++it)
+          if (it->first == pNode)
+            return true;
+      return false;
+    }
   private:
     const NodeT* mpData;
     DependencyLinkList mDependencies;
@@ -196,6 +204,12 @@ namespace cot
       DependencyNode<NodeT>* pFrom = getNodeByData(pDependent);
       DependencyNode<NodeT>* pTo = getNodeByData(pDepency);
       pFrom->addDependencyTo(pTo, type);
+    }
+    
+    bool depends(const NodeT* pNode1, const NodeT* pNode2) const {
+      const DependencyNode<NodeT>* pFrom = getNodeByData(pNode1);
+      const DependencyNode<NodeT>* pTo = getNodeByData(pNode2);
+      return pFrom->dependsFrom(pTo);
     }
 
     nodes_iterator begin_children()

@@ -18,6 +18,8 @@
 
 
 #include "cot/DependencyGraph/ProgramDependencies.h"
+#include "cot/DependencyGraph/DataDependencies.h"
+#include "cot/DependencyGraph/ControlDependencies.h"
 
 #include "cot/AllPasses.h"
 #include "llvm/Function.h"
@@ -33,11 +35,16 @@ char ProgramDependencyGraph::ID = 0;
 
 bool ProgramDependencyGraph::runOnFunction(Function &F)
 {
+  DataDepGraph* DDG = getAnalysis<DataDependencyGraph>().DDG;
+  DataDepGraph* CDG = getAnalysis<ControlDependencyGraph>().CDG;
+  
   for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it)
     for (Function::BasicBlockListType::const_iterator it2 = F.getBasicBlockList().begin(); it2 != F.getBasicBlockList().end(); ++it2)
     {
-      PDG->addDependency(&*it, &*it2, CONTROL);
-      PDG->addDependency(&*it, &*it2, DATA);
+      if(DDG->depends(&*it, &*it2))
+        PDG->addDependency(&*it, &*it2, DATA);
+      if(CDG->depends(&*it, &*it2))
+        PDG->addDependency(&*it, &*it2, CONTROL);
     }
   return false;
 }
@@ -45,6 +52,8 @@ bool ProgramDependencyGraph::runOnFunction(Function &F)
 
 void ProgramDependencyGraph::getAnalysisUsage(AnalysisUsage &AU) const
 {
+  AU.addRequired<DataDependencyGraph>();
+  AU.addRequired<ControlDependencyGraph>();
   AU.setPreservesAll();
 }
 
