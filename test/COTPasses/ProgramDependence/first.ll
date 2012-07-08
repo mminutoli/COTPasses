@@ -37,3 +37,7 @@ define i32 @first() nounwind uwtable {
 ;CHECK:      Printing analysis 'Program Dependency Graph Construction' for function 'first':
 ;CHECK-NEXT: =============================--------------------------------
 ;CHECK-NEXT: Program Dependency Graph: 
+;CHECK-NEXT:     %0 { %1:1 %4:1 %9:1 }
+;CHECK-NEXT:     %1 { %4:0 %9:0 }
+;CHECK-NEXT:     %4 { }
+;CHECK-NEXT:     %9 { }
