@@ -21,7 +21,6 @@
 
 #include "llvm/BasicBlock.h"
 #include "llvm/Assembly/Writer.h"
-#include "llvm/ADT/DepthFirstIterator.h"
 #include "llvm/ADT/GraphTraits.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -80,7 +79,8 @@ namespace cot
          return;
       DependencyLink link = DependencyLink(pNode, type);
       // Avoid double links.
-      if (std::find(mDependencies.begin(), mDependencies.end(), link) == mDependencies.end())
+      if (std::find(mDependencies.begin(), mDependencies.end(), link)
+          == mDependencies.end())
       mDependencies.push_back(link);
     }
 
@@ -191,8 +191,6 @@ namespace cot
       typename DataToNodeMap::const_iterator it = mDataToNode.find(pData);
       if (it == mDataToNode.end())
       {
-        //        errs() << "Node with data " << pData <<
-        //                " not found within dependency graph " << this << ".";
         return 0;
       }
       return it->second;
@@ -205,7 +203,7 @@ namespace cot
       DependencyNode<NodeT>* pTo = getNodeByData(pDepency);
       pFrom->addDependencyTo(pTo, type);
     }
-    
+
     bool depends(const NodeT* pNode1, const NodeT* pNode2) const {
       const DependencyNode<NodeT>* pFrom = getNodeByData(pNode1);
       const DependencyNode<NodeT>* pTo = getNodeByData(pNode2);
