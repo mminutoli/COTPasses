@@ -37,8 +37,11 @@ bool ProgramDependencyGraph::runOnFunction(Function &F)
 {
   DataDepGraph* DDG = getAnalysis<DataDependencyGraph>().DDG;
   DataDepGraph* CDG = getAnalysis<ControlDependencyGraph>().CDG;
-  
+
   for (Function::BasicBlockListType::const_iterator it = F.getBasicBlockList().begin(); it != F.getBasicBlockList().end(); ++it)
+  {
+    if (CDG->depends(CDG->getRootNode()->getData(), &*it ))
+      PDG->addDependency(static_cast<BasicBlock *>(0), &*it, CONTROL);
     for (Function::BasicBlockListType::const_iterator it2 = F.getBasicBlockList().begin(); it2 != F.getBasicBlockList().end(); ++it2)
     {
       if(DDG->depends(&*it, &*it2))
@@ -46,6 +49,7 @@ bool ProgramDependencyGraph::runOnFunction(Function &F)
       if(CDG->depends(&*it, &*it2))
         PDG->addDependency(&*it, &*it2, CONTROL);
     }
+  }
   return false;
 }
 
