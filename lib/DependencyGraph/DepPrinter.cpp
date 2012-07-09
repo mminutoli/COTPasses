@@ -146,7 +146,7 @@ struct DataDependencyViewer
 {
   static char ID;
   DataDependencyViewer() :
-      DOTGraphTraitsViewer<DataDependencyGraph, false>("ddgraph", ID) {}
+      DOTGraphTraitsViewer<DataDependencyGraph, false>("ddg", ID) {}
 };
 
 
@@ -155,7 +155,7 @@ struct ControlDependencyViewer
 {
   static char ID;
   ControlDependencyViewer() :
-      DOTGraphTraitsViewer<ControlDependencyGraph, false>("cdgraph", ID) {}
+      DOTGraphTraitsViewer<ControlDependencyGraph, false>("cdg", ID) {}
 };
 
 
@@ -164,7 +164,7 @@ struct ProgramDependencyViewer
 {
   static char ID;
   ProgramDependencyViewer() :
-      DOTGraphTraitsViewer<ProgramDependencyGraph, false>("pdgraph", ID) {}
+      DOTGraphTraitsViewer<ProgramDependencyGraph, false>("pdg", ID) {}
 };
 }
 
@@ -191,7 +191,7 @@ struct DataDependencyPrinter
 {
   static char ID;
   DataDependencyPrinter()
-      : DOTGraphTraitsPrinter<DataDependencyGraph, false>("ddgragh", ID) {}
+      : DOTGraphTraitsPrinter<DataDependencyGraph, false>("ddg", ID) {}
 };
 
 
@@ -200,7 +200,7 @@ struct ControlDependencyPrinter
 {
   static char ID;
   ControlDependencyPrinter()
-      : DOTGraphTraitsPrinter<ControlDependencyGraph, false>("cdgragh", ID) {}
+      : DOTGraphTraitsPrinter<ControlDependencyGraph, false>("cdg", ID) {}
 };
 
 
@@ -209,7 +209,7 @@ struct ProgramDependencyPrinter
 {
   static char ID;
   ProgramDependencyPrinter()
-      : DOTGraphTraitsPrinter<ProgramDependencyGraph, false>("pdgragh", ID) {}
+      : DOTGraphTraitsPrinter<ProgramDependencyGraph, false>("pdg", ID) {}
 };
 }
 }
